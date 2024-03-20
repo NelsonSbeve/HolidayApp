@@ -17,6 +17,8 @@ public class Colaborator : IColaborator
 			throw new ArgumentException("Invalid arguments.");
 	}
 
+
+	
 	private bool isValidParameters(string strName, string strEmail) {
 
 		if( strName==null ||
@@ -53,7 +55,4 @@ public class Colaborator : IColaborator
 		return valid;
 	}
 
-	public string getName() {
-		return _strName;
-	}
 }
