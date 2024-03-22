@@ -19,6 +19,12 @@ public class HolidayPeriod
 			throw new ArgumentException("invalid arguments: start date >= end date.");
 	}
 
+	// public int DurationInDays(){
+	// 	var days= _endDate.DayNumber-_startDate.DayNumber;
+	// 	return days;
+
+	// }
+
 	public DateOnly getStartDate(){
 		return _startDate;
 	}

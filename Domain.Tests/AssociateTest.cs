@@ -17,7 +17,7 @@ namespace Domain.Tests
         Mock<IColaborator> colabDouble = new Mock<IColaborator>();
         Mock<IProject> projDouble = new Mock<IProject>();
 
-        Associate associate = new Associate(colabDouble.Object, projDouble.Object,initialDate, FinalDate );
+        Associate associate = new Associate(colabDouble.Object, initialDate, FinalDate );
 
         Assert.NotNull(associate);
 
@@ -29,57 +29,68 @@ namespace Domain.Tests
         DateOnly initialDate = DateOnly.MinValue;
         DateOnly FinalDate = DateOnly.MaxValue;
         Mock<IProject> projDouble = new Mock<IProject>();
-        Assert.Throws<ArgumentNullException>(() => new Associate(null, projDouble.Object, FinalDate, initialDate));
+        Assert.Throws<ArgumentNullException>(() => new Associate(null, FinalDate, initialDate));
     }
 
     [Fact]
-    public void WhenPassingNullAsProject_ThenThrowsException()
+    public void IsColaboratorInProject_ReturnsFalse_WhenColaboratorIsDifferent()
     {
+        // Arrange
         DateOnly initialDate = DateOnly.MinValue;
         DateOnly FinalDate = DateOnly.MaxValue;
-        Mock<IColaborator> colabDouble = new Mock<IColaborator>();
-        Assert.Throws<ArgumentNullException>(() => new Associate(colabDouble.Object, null, initialDate, FinalDate));
+        var colabDouble = new Mock<IColaborator>();
+        var colabDouble2 = new Mock<IColaborator>();
+        Associate associate = new Associate(colabDouble2.Object, initialDate, FinalDate );
+
+
+        // Act
+        var result = associate.IsColaboratorInProject(colabDouble.Object);
+
+        // Assert
+        Assert.False(result);
     }
-
-
-    
-    
     [Fact]
-    public void Colaborator_Property_Should_Return_Correct_Value()
+    public void AddColaboratorIfInPeriod_AddsColaboratorToList_WhenAssociateIsInPeriod()
     {
         // Arrange
+        var startDate = new DateOnly(2024, 1, 1); 
+        var endDate = new DateOnly(2024, 1, 31); 
+        var colaborators = new List<IColaborator>();
         var mockColaborator = new Mock<IColaborator>();
-        var mockProject = new Mock<IProject>();
+        var associate = new Associate(mockColaborator.Object, startDate,endDate);
+
+
+        // Act
+        var result = associate.AddColaboratorIfInPeriod(colaborators, startDate, endDate);
+
+        // Assert
+        Assert.Single(result); 
+        Assert.Contains(mockColaborator.Object, result); 
+    }
+
+    [Fact]
+    public void AddColaboratorIfInPeriod_DoesNotAddColaboratorToList_WhenAssociateIsNotInPeriod()
+    {
+        // Arrange
+        var startDate = new DateOnly(2024, 1, 1); 
+        var endDate = new DateOnly(2024, 1, 31); 
+        var colaborators = new List<IColaborator>();
+        var mockColaborator = new Mock<IColaborator>();
+        var associate = new Associate(mockColaborator.Object, startDate.AddDays(80),endDate.AddDays(90));
        
 
-        Associate associate = new Associate(mockColaborator.Object, mockProject.Object, default, default); // Initialize Associate
-
         // Act
-        IColaborator actualColaborator = associate.Colaborator;
+        var result = associate.AddColaboratorIfInPeriod(colaborators, startDate, endDate);
 
         // Assert
-        Assert.Equal(mockColaborator.Object, actualColaborator);
+        Assert.Empty(result); 
     }
 
-    [Fact]
-    public void GetAssociation_Method_Should_Return_Correct_Values()
-    {
-        // Arrange
-        var mockColaborator = new Mock<IColaborator>();
-        var mockProject = new Mock<IProject>();
-        var dateStart = new DateOnly(2024, 3, 20); // Example date start
-        var dateEnd = new DateOnly(2024, 3, 25); // Example date end
 
-        Associate associate = new Associate(mockColaborator.Object, mockProject.Object, dateStart, dateEnd); // Initialize Associate
 
-        // Act
-        var association = associate.GetAssociation();
 
-        // Assert
-        Assert.Equal(mockColaborator.Object, association.Item1);
-        Assert.Equal(mockProject.Object, association.Item2);
-        Assert.Equal(dateStart, association.Item3);
-        Assert.Equal(dateEnd, association.Item4);
-    }
+
+    
+
     }
 }

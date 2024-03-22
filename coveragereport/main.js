@@ -221,13 +221,14 @@ var assemblies = [
   {
     "name": "Domain",
     "classes": [
-      { "name": "Domain.Associate", "rp": "Domain_Associate.html", "cl": 12, "ucl": 0, "cal": 12, "tl": 35, "cb": 4, "tb": 4, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Domain.Colaborator", "rp": "Domain_Colaborator.html", "cl": 31, "ucl": 0, "cal": 31, "tl": 58, "cb": 12, "tb": 12, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Domain.Holiday", "rp": "Domain_Holiday.html", "cl": 34, "ucl": 0, "cal": 34, "tl": 74, "cb": 8, "tb": 8, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Domain.HolidayPeriod", "rp": "Domain_HolidayPeriod.html", "cl": 14, "ucl": 0, "cal": 14, "tl": 29, "cb": 2, "tb": 2, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Domain.Holidays", "rp": "Domain_Holidays.html", "cl": 71, "ucl": 18, "cal": 89, "tl": 151, "cb": 26, "tb": 38, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Domain.Associate", "rp": "Domain_Associate.html", "cl": 31, "ucl": 0, "cal": 31, "tl": 62, "cb": 16, "tb": 18, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Domain.Colaborator", "rp": "Domain_Colaborator.html", "cl": 34, "ucl": 0, "cal": 34, "tl": 62, "cb": 12, "tb": 12, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Domain.FactoryHoliday", "rp": "Domain_FactoryHoliday.html", "cl": 0, "ucl": 3, "cal": 3, "tl": 17, "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Domain.Holiday", "rp": "Domain_Holiday.html", "cl": 52, "ucl": 0, "cal": 52, "tl": 101, "cb": 22, "tb": 22, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Domain.HolidayPeriod", "rp": "Domain_HolidayPeriod.html", "cl": 14, "ucl": 0, "cal": 14, "tl": 35, "cb": 2, "tb": 2, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Domain.Holidays", "rp": "Domain_Holidays.html", "cl": 68, "ucl": 15, "cal": 83, "tl": 137, "cb": 22, "tb": 30, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
       { "name": "Domain.Opinion", "rp": "Domain_Opinion.html", "cl": 6, "ucl": 0, "cal": 6, "tl": 32, "cb": 4, "tb": 4, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
-      { "name": "Domain.Project", "rp": "Domain_Project.html", "cl": 21, "ucl": 0, "cal": 21, "tl": 65, "cb": 2, "tb": 2, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
+      { "name": "Domain.Project", "rp": "Domain_Project.html", "cl": 23, "ucl": 14, "cal": 37, "tl": 107, "cb": 4, "tb": 10, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
       { "name": "Domain.Skills", "rp": "Domain_Skills.html", "cl": 17, "ucl": 0, "cal": 17, "tl": 46, "cb": 8, "tb": 8, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
       { "name": "Domain.Training", "rp": "Domain_Training.html", "cl": 16, "ucl": 0, "cal": 16, "tl": 38, "cb": 4, "tb": 4, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
       { "name": "Domain.TrainingPeriod", "rp": "Domain_TrainingPeriod.html", "cl": 8, "ucl": 0, "cal": 8, "tl": 25, "cb": 2, "tb": 2, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [], "metrics": { } },
@@ -245,16 +246,16 @@ var riskHotspotMetrics = [
 
 var riskHotspots = [
   {
-    "assembly": "Domain", "class": "Domain.Holidays", "reportPath": "Domain_Holidays.html", "methodName": "GetDaysOfHolidayFromProjectOfColaborator(System.DateOnly,System.DateOnly,IColaborator,Domain.IProject)", "methodShortName": "GetDaysOfHolidayFromProjectOfColaborator(...)", "fileIndex": 0, "line": 73,
+    "assembly": "Domain", "class": "Domain.Holidays", "reportPath": "Domain_Holidays.html", "methodName": "GetPeriodsOfHolidaysOfColaboratorInPeriod(Domain.Colaborator,System.DateOnly,System.DateOnly)", "methodShortName": "GetPeriodsOfHolidaysOfColaboratorInPeriod(...)", "fileIndex": 0, "line": 112,
     "metrics": [
-      { "value": 23.14, "exceeded": true },
-      { "value": 14, "exceeded": false },
+      { "value": 72, "exceeded": true },
+      { "value": 8, "exceeded": false },
     ]},
   {
-    "assembly": "Domain", "class": "Domain.Holidays", "reportPath": "Domain_Holidays.html", "methodName": "GetDaysOfHolidayFromProjectOfAll(System.DateOnly,System.DateOnly,Domain.IProject)", "methodShortName": "GetDaysOfHolidayFromProjectOfAll(...)", "fileIndex": 0, "line": 111,
+    "assembly": "Domain", "class": "Domain.Project", "reportPath": "Domain_Project.html", "methodName": "GetPeriodInsideProject(System.DateOnly,System.DateOnly)", "methodShortName": "GetPeriodInsideProject(...)", "fileIndex": 0, "line": 46,
     "metrics": [
-      { "value": 22.91, "exceeded": true },
-      { "value": 16, "exceeded": false },
+      { "value": 20, "exceeded": true },
+      { "value": 4, "exceeded": false },
     ]},
 ];
 

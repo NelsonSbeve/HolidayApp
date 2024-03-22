@@ -53,82 +53,12 @@ namespace Domain.Tests
             project.AddColaborator(mockColaborator.Object, startDate, endDate);
 
             // Assert
-            Assert.Single(project.GetAssociations());
+            Assert.True(project.IsColaboratorInProject(mockColaborator.Object));
         }
 
-        [Fact]
-        public void AddColaborator_Should_Add_Correct_Colaborator_And_Dates()
-        {
-            // Arrange
-            var project = new Project("ProjectName", DateOnly.MinValue, DateOnly.MaxValue);
-            var mockColaborator = new Mock<IColaborator>();
-            DateOnly startDate = new DateOnly(2024, 3, 18);
-            DateOnly endDate = new DateOnly(2024, 3, 25);
 
-            // Act
-            project.AddColaborator(mockColaborator.Object, startDate, endDate);
 
-            // Assert
-            IAssociate associate = project.GetAssociations()[0];
-            Assert.Equal(mockColaborator.Object, associate.Colaborator);
-            Assert.Equal(startDate, associate.DateStart);
-            Assert.Equal(endDate, associate.DateEnd);
-        }
 
-        [Fact]
-        public void GetAssociations_Should_Return_Associations_List()
-        {
-                    // Arrange
-            DateOnly initialDate = DateOnly.MinValue;
-            DateOnly finalDate = DateOnly.MaxValue;
-
-            var colabDouble1 = new Mock<IColaborator>();
-            var colabDouble2 = new Mock<IColaborator>();
-
-            string projectName = "ProjectName";
-            Project project = new Project(projectName, initialDate, finalDate);
-            project.AddColaborator(colabDouble1.Object, initialDate, finalDate);
-            project.AddColaborator(colabDouble2.Object, initialDate, finalDate);
-
-            // Act
-            List<IAssociate> actualAssociations = project.GetAssociations();
-
-            // Assert
-            Assert.Equal(2, actualAssociations.Count); // Assuming 2 collaborators were added
-        }
-        
-
-        [Fact]
-        public void DateStart_Should_Return_Correct_Value()
-        {
-            // Arrange
-            DateOnly expectedDateStart = new DateOnly(2024, 3, 18);
-            DateOnly expectedDateEnd = new DateOnly(2024, 3, 18); // Example date
-            Project project = new Project("new",expectedDateStart, expectedDateEnd);
-            
-
-            // Act
-            DateOnly actualDateStart = project.DateStart;
-
-            // Assert
-            Assert.Equal(expectedDateStart, actualDateStart);
-        }
-
-        [Fact]
-        public void DateEnd_Should_Return_Correct_Value()
-        {
-            // Arrange
-            DateOnly expectedDateStart = new DateOnly(2024, 3, 25);
-            DateOnly expectedDateEnd = new DateOnly(2024, 3, 25); // Example date
-            Project project = new Project("new", expectedDateStart, expectedDateEnd );
-            
-
-            // Act
-            DateOnly? actualDateEnd = project.DateEnd;
-
-            // Assert
-            Assert.Equal(expectedDateEnd, actualDateEnd);
-        }
             
     }
 }

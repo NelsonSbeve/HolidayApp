@@ -7,29 +7,56 @@ namespace Domain
 {
     public class Associate : IAssociate
     {
-        private IColaborator colaborator;
-        private IProject project;
-        public DateOnly DateStart { get; private set; }
-        public DateOnly DateEnd{ get; private set; }
+        private IColaborator _colaborator;
+        public DateOnly DateStart;
+        public DateOnly DateEnd;
 
-        public Associate( IColaborator pColaborator, IProject pProject, DateOnly pDateStart, DateOnly pDateEnd ){
+        public Associate(IColaborator pColaborator, DateOnly pDateStart, DateOnly pDateEnd ){
 
-            colaborator = pColaborator ?? throw new ArgumentNullException(nameof(pColaborator));
-            project = pProject ?? throw new ArgumentNullException(nameof(pProject));
+            if (pColaborator != null)
+            {
+                _colaborator = pColaborator;
+            }else 
+                throw new ArgumentNullException();
             DateStart = pDateStart;
             DateEnd = pDateEnd;
         }
 
-        public IColaborator Colaborator
+        public bool IsColaboratorInProject(IColaborator colaborator)
         {
-        get { return colaborator; }
+            if (colaborator == _colaborator)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public List<IColaborator> AddColaboratorIfInPeriod(List<IColaborator> colaborators, DateOnly startDate, DateOnly endDate)
+        {
+            if (IsAssociateInPeriod(startDate, endDate))
+            {
+                IColaborator colab = _colaborator;
+                colaborators.Add(colab);
+            }
+ 
+            return colaborators;
+        }
+ 
+ 
+        public bool IsAssociateInPeriod(DateOnly startDate, DateOnly endDate)
+        {
+            if (DateStart >= startDate && DateEnd <= endDate ||
+            DateStart <= startDate && DateEnd > startDate ||
+            DateStart < endDate && DateEnd >= endDate)
+            {
+                return true;
+            }
+ 
+            return false;
         }
 
 
 
-        public (IColaborator, IProject, DateOnly, DateOnly) GetAssociation()
-        {
-            return (colaborator, project, DateStart, DateEnd);
-        }
+
     }
 }

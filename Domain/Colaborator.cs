@@ -14,7 +14,7 @@ public class Colaborator : IColaborator
 			_strEmail = strEmail;
 		}
 		else
-			throw new ArgumentException("Invalid arguments.");
+			throw new ArgumentException();
 	}
 
 
@@ -53,6 +53,10 @@ public class Colaborator : IColaborator
 		}
 
 		return valid;
+	}
+
+	public string GetName(){
+		return _strName;
 	}
 
 }

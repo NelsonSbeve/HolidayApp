@@ -6,15 +6,11 @@ public class HolidayTest
     [Fact]
     public void WhenPassingAColaborator_ThenHolidayIsInstantiated()
     {
-        //Mock<Colaborator> colabDouble = new Mock<Colaborator>("a", "b@b.pt");
+        
         Mock<IColaborator> colabDouble = new Mock<IColaborator>();
 
         new Holiday(colabDouble.Object);
-
-        // isto não é um tewste unitário a Holiday, porque não isola do Colaborator
-        // Colaborator colab = new Colaborator("a", "a@b.c");
-        // IColaborator colab = new Colaborator("a", "a@b.c");
-        // new Holiday(colab);
+  
     }
 
 
@@ -23,24 +19,6 @@ public class HolidayTest
     {
         Assert.Throws<ArgumentException>(() => new Holiday(null));
     }
-
-
-    // [Fact]
-    // public void WhenRequestingName_ThenReturnColaboratorName()
-    // {
-    //     // arrange
-    //     string NOME = "nome";
-    //     Mock<IColaborator> colabDouble = new Mock<IColaborator>();
-    //     colabDouble.Setup(p => p.getName()).Returns(NOME);
-
-    //     Holiday holiday = new Holiday(colabDouble.Object); // SUT/OUT
-
-    //     // act
-    //     string nameResult = holiday.getName();
-
-    //     // assert
-    //     Assert.Equal(NOME, nameResult);
-    // }
 
     [Fact]
     public void WhenAddingNewPeriod_ThenPeriodIsAdded()
@@ -101,26 +79,10 @@ public class HolidayTest
         
 
         // Act
-        var result = holiday.GetHolidayPeriods();
+        var result = holiday.GetHolidayPeriod(initialDate, FinalDate);
 
         // Assert
         Assert.Equal(holidayPeriods, result);
-    }
-
-    [Fact]
-    public void GetDaysOfHoliday_Should_Return_Correct_Number_Of_Days()
-    {
-        // Arrange
-        DateOnly initialDate = DateOnly.MinValue;
-        DateOnly FinalDate = DateOnly.MaxValue;
-        Mock<IColaborator> colabDouble = new Mock<IColaborator>();
-        Holiday holiday = new Holiday(colabDouble.Object);
-
-        // Act
-        int numberOfDays = holiday.GetDaysOfHoliday(initialDate, FinalDate);
-
-        // Assert
-        Assert.Equal(3652058, numberOfDays);
     }
 
     [Fact]
@@ -143,7 +105,7 @@ public class HolidayTest
         // Arrange
         var mockColaborator = new Mock<IColaborator>();
         var holiday = new Holiday(mockColaborator.Object);
-        holiday.addHolidayPeriod(DateOnly.MinValue, DateOnly.MaxValue); // Adding a period that does not match
+        holiday.addHolidayPeriod(DateOnly.MinValue, DateOnly.MaxValue); 
 
         // Act
         var result = holiday.GetHolidayPeriod(new DateOnly(2024, 3, 18), new DateOnly(2024, 3, 25));
@@ -173,24 +135,104 @@ public class HolidayTest
         Assert.Equivalent(matchingPeriod, result[0]);
     }
 
-    [Fact]
-    public void GetColaborator_Should_Return_Correct_Colaborator()
+    [Theory]
+    [InlineData("2024-01-01", "2024-01-31", "2024-01-01", "2024-01-31", 31)] 
+    [InlineData("2024-01-01", "2024-01-31", "2024-01-15", "2024-01-20", 6)] 
+    [InlineData("2024-01-01", "2024-01-31", "2024-02-01", "2024-02-10", 0)]
+    [InlineData("2024-01-01", "2024-01-31", "2023-12-15", "2024-02-10", 31)] 
+    [InlineData("2024-01-01", "2024-01-31", "2023-12-15", "2024-01-10", 10)]
+    [InlineData("2024-01-01", "2024-01-31", "2024-01-01", "2024-01-10", 10)] 
+    [InlineData("2024-01-01", "2024-01-31", "2024-01-20", "2024-01-31", 12)] 
+    public void GetDaysOfHolidayInsidePeriod_ReturnsCorrectNumberOfDays(string holidayStartString, string holidayEndString, string projectStartString, string projectEndString, int expectedDays)
     {
         // Arrange
-        var mockColaborator = new Mock<IColaborator>();
-        
+        var holidayStart = DateOnly.Parse(holidayStartString);
+        var holidayEnd = DateOnly.Parse(holidayEndString);
+        var projectStart = DateOnly.Parse(projectStartString);
+        var projectEnd = DateOnly.Parse(projectEndString);
+        var colabMock = new Mock<IColaborator>();
 
-        Holiday holiday = new Holiday(mockColaborator.Object);
-        
+        var holiday = new Holiday(colabMock.Object);
+
+        // Add holiday period
+        holiday.addHolidayPeriod(holidayStart, holidayEnd);
 
         // Act
-        var result = holiday.GetColaborator();
+        var result = holiday.GetDaysOfHolidayInsidePeriod(projectStart, projectEnd);
 
         // Assert
-        Assert.Equal(mockColaborator.Object, result);
+        Assert.Equal(expectedDays, result);
     }
 
+    [Fact]
+    public void GetDaysOfHolidayInsidePeriod_ReturnsZero_WhenNoHolidayPeriodsAdded()
+    {
+        // Arrange
+        var colabMock = new Mock<IColaborator>();
+        var holiday = new Holiday(colabMock.Object);
+        var projectStart = new DateOnly(2024, 1, 1); 
+        var projectEnd = new DateOnly(2024, 1, 10); 
 
+        // Act
+        var result = holiday.GetDaysOfHolidayInsidePeriod(projectStart, projectEnd);
+
+        // Assert
+        Assert.Equal(0, result);
+    }
+    [Fact]
+    public void GetDaysOfHolidayInsidePeriod_ReturnsZero_WhenProjectPeriodHasZeroLength()
+    {
+        // Arrange
+        var colabMock = new Mock<IColaborator>();
+        var holiday = new Holiday(colabMock.Object);
+        var projectStart = new DateOnly(2024, 1, 10); 
+        var projectEnd = new DateOnly(2024, 1, 10); 
+
+        // Act
+        var result = holiday.GetDaysOfHolidayInsidePeriod(projectStart, projectEnd);
+
+        // Assert
+        Assert.Equal(0, result);
+    }
+    [Fact]
+    public void GetColaboratorwithMoreThen_ReturnsColaboratorOrNull_WhenHolidayPeriodExceedsOrDoesNotExceedXDays()
+    {
+        // Arrange
+        var colabMock = new Mock<IColaborator>();
+        var holiday = new Holiday(colabMock.Object);
+
+        var Start = new DateOnly(2024, 1, 1); 
+        var End = new DateOnly(2024, 1, 10);
+
+        holiday.addHolidayPeriod(Start, End);
+        var xDays = 20; 
+        var Xdays2= 5;
+
+        // Act
+        var result = holiday.GetColaboratorwithMoreThen(xDays);
+        var result2 = holiday.GetColaboratorwithMoreThen(Xdays2);
+
+        // Assert
+        Assert.Null(result);
+        Assert.NotNull(result2);
+    }
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)] 
+    public void IsColaboradorInHoliday_ReturnsExpectedValue(bool expectedResult)
+    {
+        // Arrange
+        var colaboratorMock = new Mock<IColaborator>();
+        var holiday = new Holiday(colaboratorMock.Object);
+
+        
+        colaboratorMock.Setup(c => c.Equals(It.IsAny<IColaborator>())).Returns(expectedResult);
+        // Act
+        var result = holiday.IsColaboradorInHoliday(colaboratorMock.Object);
+
+        // Assert
+        Assert.Equal(expectedResult, result);
+    }
 
 
 }

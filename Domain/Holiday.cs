@@ -15,7 +15,7 @@ public class Holiday : IHoliday
 		else
 			throw new ArgumentException("Invalid argument: colaborator must be non null");
 
-		//_colaborator = colab ?? throw new ArgumentException("Invalid argument: colaborator must be non null");
+		
 	}
 
 	public HolidayPeriod addHolidayPeriod(DateOnly startDate, DateOnly endDate) {
@@ -45,30 +45,57 @@ public class Holiday : IHoliday
 		return result;
 	}
 
-	public List<HolidayPeriod> GetHolidayPeriods()
+
+
+	public int GetDaysOfHolidayInsidePeriod(DateOnly projectStartDate, DateOnly projectEndDate){
+
+		var totalResult = 0;
+		foreach(var period in _holidayPeriods){
+			DateOnly periodStart = period._startDate > projectStartDate ? period._startDate : projectStartDate;
+			DateOnly periodEnd = period._endDate < projectEndDate ? period._endDate : projectEndDate;
+			// Check if the holiday period intersects with the specified period
+			if (periodStart <= periodEnd)
+			{
+				// Calculate the number of days within the intersection
+
+				int daysInIntersection = (periodEnd.ToDateTime(TimeOnly.Parse("10:00PM")) - periodStart.ToDateTime(TimeOnly.Parse("10:00PM"))).Days + 1;
+
+				totalResult += daysInIntersection;
+			}
+		}
+
+
+		return totalResult;
+	}
+
+	public IColaborator GetColaboratorwithMoreThen(int XDays){
+        foreach (var period in _holidayPeriods)
+		{
+			DateTime endDateTime = period._endDate.ToDateTime(TimeOnly.Parse("10:00PM"));
+			DateTime startDateTime = period._startDate.ToDateTime(TimeOnly.Parse("10:00PM"));
+			TimeSpan difference = endDateTime.Subtract(startDateTime);
+            int numberOfDays = difference.Days;
+            if (numberOfDays > XDays){
+				return _colaborator;
+			}
+
+		}
+		return null;
+	}
+
+	public bool IsColaboradorInHoliday(IColaborator colaborator)
     {
-        return _holidayPeriods;
+        if (colaborator.Equals(_colaborator))
+        {
+            return true;
+        }
+ 
+        return false;
     }
 
 
-	public int GetDaysOfHoliday(DateOnly startDate, DateOnly endDate){
-
-		DateTime startDateTime = new DateTime(startDate.Year, startDate.Month, startDate.Year );
-        DateTime endDateTime = new DateTime(endDate.Year, endDate.Month, endDate.Day);
-		
-		TimeSpan difference = endDateTime.Subtract(startDateTime);
-		int numberOfDays = difference.Days;
-
-
-		return numberOfDays;
-	}
-
-	public IColaborator GetColaborator() {
-
-
-	   return _colaborator;
-;
-	}
-
 }
+
+
+
 

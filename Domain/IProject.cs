@@ -7,10 +7,11 @@ namespace Domain
 {
     public interface IProject
     {
-        DateOnly _dateStart { get; }
-        DateOnly _dateEnd { get; }
+        public List<DateOnly> GetPeriodInsideProject(DateOnly DateStart, DateOnly DateEnd);
+        public bool IsColaboratorInProject(IColaborator colaborator);
 
         List<IAssociate> AddColaborator(IColaborator colaborator, DateOnly initialDate, DateOnly finalDate);
-        List<IAssociate> GetAssociations();
+        public List<IColaborator> GetColabortorInPeriod(DateOnly startDate, DateOnly endDate);
+ 
     }
 }

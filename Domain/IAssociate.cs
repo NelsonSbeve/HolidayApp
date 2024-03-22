@@ -7,8 +7,8 @@ namespace Domain
 {
     public interface IAssociate
     {
-        IColaborator Colaborator { get; }
-        DateOnly DateStart { get; }
-        DateOnly DateEnd { get; }
+        public bool IsColaboratorInProject(IColaborator colaborator);
+        public List<IColaborator> AddColaboratorIfInPeriod(List<IColaborator> colaborators, DateOnly startDate, DateOnly endDate);
+        
     }
 }

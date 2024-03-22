@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 
 namespace Domain
@@ -8,31 +9,41 @@ namespace Domain
     public class Holidays
     {
         private List<IHoliday> holidays;
+        private IFactoryHoliday _factoryHoliday;
 
 
-        public Holidays(List<IHoliday> pHolidays)
+        public Holidays(IFactoryHoliday fHoliday)
         {
-            holidays = new List<IHoliday>(pHolidays);
+            holidays = new List<IHoliday>();
+            _factoryHoliday = fHoliday;
+        }
+
+        public int CountHolidays(){
+            int count = 0;
+            foreach(var holiday in holidays){
+                count++;
+            }
+            return count;
         }
 
 
 
-        public void addHoliday(IHoliday holiday)
+
+        public IHoliday addHoliday(IColaborator colaborator)
         {
+            var holiday = _factoryHoliday.newHoliday(colaborator);
             holidays.Add(holiday);
+            return holiday;
         }
 
-        public List<IHoliday> GetHolidays()
-        {
-            return holidays;
-        }
+ 
         public List<IHoliday> GetHolidaysOfColaborator(IColaborator colaborator)
         {
             List<IHoliday> holidaysOfColaborator = new List<IHoliday>();
 
             foreach (var holiday in holidays)
             {
-                if (holiday.GetColaborator() == colaborator)
+                if (holiday.IsColaboradorInHoliday(colaborator))
                 {
                     holidaysOfColaborator.Add(holiday);
                 }
@@ -41,125 +52,86 @@ namespace Domain
             return holidaysOfColaborator;
         }
 
-        public List<IHoliday> GetHolidaysByColaborator(IColaborator colaborator)
-        {
-            return holidays.Where(holiday => holiday.GetColaborator() == colaborator).ToList();
-        }
 
-        public bool IsColaboratorInProject(IColaborator colaborator, IProject project)
-            {
-                // Get the list of associations for the project
-                List<IAssociate> projectAssociations = project.GetAssociations();
-
-                // Iterate through the list of associations
-                foreach (IAssociate associate in projectAssociations)
-                {
-                    // Check if the collaborator matches the one in the current association
-                    if (associate.Colaborator == colaborator)
-                    {
-                        // Collaborator found in the project
-                        return true;
-                    }
-                }
-
-                // Collaborator not found in the project
-                return false;
-            }
-
-
-
-
-        public int GetDaysOfHolidayFromProjectOfColaborator(DateOnly dateStart, DateOnly dateEnd, IColaborator colaborator, IProject project)
+        //need fix
+        public int GetDaysOfHolidayFromProjectOfColaborator(DateOnly DateStart, DateOnly DateEnd, IColaborator colaborator, IProject project)
         {
             int result = 0;
-            DateOnly projectStartDate = project._dateStart > dateStart ? project._dateStart : dateStart;
-            DateOnly projectEndDate =  project._dateEnd < dateEnd ? project._dateEnd : dateEnd;
-
-            bool isInProject = IsColaboratorInProject(colaborator, project);
-            List<IHoliday> holidayList = GetHolidaysOfColaborator(colaborator);
-
-            if (isInProject)
+            List<DateOnly> datas = project.GetPeriodInsideProject(DateStart,DateEnd);
+            if (datas != null && datas.Count >= 2)
             {
+                var projectStartDate = datas[0];
+                var projectEndDate = datas[1];
+
+                bool isInProject = project.IsColaboratorInProject(colaborator);
                 
-                if ( projectEndDate >= project._dateStart || projectStartDate <= project._dateEnd)
+                if (isInProject)
                 {
-                    foreach (var holiday in holidayList)
+                    
+                    foreach (var holiday in holidays)
                     {  
+                        if(holiday.IsColaboradorInHoliday(colaborator)){
 
-                        foreach (var period in holiday.GetHolidayPeriods())
-                        {
-                            // Check if the holiday period intersects with the specified period
-                            if (period._endDate >= project._dateStart || period._startDate <= project._dateEnd)
-                            {
-                                // Calculate the number of days within the intersection
-                                DateTime intersectionStartDate = period._startDate.ToDateTime(TimeOnly.Parse("10:00PM"));
-                                DateTime intersectionEndDate = period._endDate.ToDateTime(TimeOnly.Parse("10:00PM"));
-                                int daysInIntersection = (intersectionEndDate - intersectionStartDate).Days + 1;
+                            result += holiday.GetDaysOfHolidayInsidePeriod(projectStartDate,projectEndDate);
 
-
-                                result += daysInIntersection;
-                            }
                         }
-    
-                    }
+                    }  
                     
                 }
             }
-            
+            return result;
+        }
+        public int  GetDaysOfHolidayFromProjectOfAll(DateOnly startDate, DateOnly endDate, IProject project)
+        {
+            int result = 0;
+ 
+            List<IColaborator> colaborators = project.GetColabortorInPeriod(startDate, endDate);
+ 
+            foreach (IColaborator colaborator in colaborators)
+            {
+                result += GetDaysOfHolidayFromProjectOfColaborator(startDate, endDate, colaborator, project);
+            }
+           
             return result;
         }
 
-        public int GetDaysOfHolidayFromProjectOfAll(DateOnly DateStart, DateOnly DateEnd, IProject project)
-        {
-            int totalResult = 0;
-            DateOnly projectStartDate = project._dateStart > DateStart ? project._dateStart : DateStart;
-            DateOnly projectEndDate =  project._dateEnd < DateEnd ? project._dateEnd : DateEnd;
-
-            List<IColaborator> colaborators = project.GetAssociations().Select(a => a.Colaborator).ToList();
-            foreach (IColaborator colaborator in colaborators)
-            {
-                List<IHoliday> holidayList = GetHolidaysOfColaborator(colaborator);
-
-                foreach (var holiday in holidayList)
-                {
-                    foreach (var period in holiday.GetHolidayPeriods())
-                    {
-                        DateOnly periodStart = period._startDate > projectStartDate ? period._startDate : projectStartDate;
-                        DateOnly periodEnd = period._endDate < projectEndDate ? period._endDate : projectEndDate;
-                        // Check if the holiday period intersects with the specified period
-                        if (periodStart <= periodEnd)
-                        {
-                            // Calculate the number of days within the intersection
-
-                            int daysInIntersection = (periodEnd.ToDateTime(TimeOnly.Parse("10:00PM")) - periodStart.ToDateTime(TimeOnly.Parse("10:00PM"))).Days + 1;
-
-                            totalResult += daysInIntersection;
-                        }
-                    }
-                }    
-            }
-            return totalResult;
-        }
 
 
-        public List<IColaborator> GetColaboratorWithMoreThen(int XDays){
+        public List<IColaborator> GetColaboratorsWithMoreThen(int XDays){
             List<IColaborator> colaboratorsWithMoreThanXDays = new List<IColaborator>();
             foreach(var holiday in holidays)
             {
-                foreach (var period in holiday.GetHolidayPeriods())
-                {
-                    DateTime endDateTime = period._endDate.ToDateTime(TimeOnly.Parse("10:00PM"));
-                    DateTime startDateTime = period._startDate.ToDateTime(TimeOnly.Parse("10:00PM"));
-                    TimeSpan difference = endDateTime.Subtract(startDateTime);
-		            int numberOfDays = difference.Days;
-                    if (numberOfDays > XDays)
-                    {
-                        colaboratorsWithMoreThanXDays.Add(holiday.GetColaborator());
-                    }
+                var colab= holiday.GetColaboratorwithMoreThen(XDays);
+                if(colab != null){
+                colaboratorsWithMoreThanXDays.Add(colab);
                 }
             }
             return colaboratorsWithMoreThanXDays;
         }
 
+        public List<HolidayPeriod>GetPeriodsOfHolidaysOfColaboratorInPeriod(IColaborator colaborator, DateOnly startDate, DateOnly endDate){
+
+            List<HolidayPeriod> holidayPeriods = [];
+
+            List<IHoliday> holidayList = GetHolidaysOfColaborator(colaborator);
+            foreach(var holiday in holidayList){
+                List<HolidayPeriod> allHolidayPeriods = holiday.GetHolidayPeriod(startDate,startDate );
+
+                // Filter holiday periods that fall within the specified time period
+                foreach (var period in allHolidayPeriods)
+                {
+                    if (period._startDate >= startDate && period._endDate <= endDate)
+                    {
+                        holidayPeriods.Add(period);
+                    }
+                }
+            }
+
+            return holidayPeriods;
+
+        }
+
     }
+
+
 }

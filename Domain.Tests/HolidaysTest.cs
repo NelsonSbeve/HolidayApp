@@ -12,199 +12,258 @@ namespace Domain.Tests
         public void AddHoliday_Should_Add_Holiday_To_Holidays_List()
         {
             // Arrange
-            var holiday = new Mock<IHoliday>(); 
-            var holidays = new Holidays(new List<IHoliday>());
+            Mock<IFactoryHoliday> _holidayDouble = new Mock<IFactoryHoliday>();
+            var colabDouble = new Mock<IColaborator>().Object; 
+            var holidays = new Holidays(_holidayDouble.Object);
             
 
             // Act
-            holidays.addHoliday(holiday.Object);
+            holidays.addHoliday(colabDouble);
 
             // Assert
-            Assert.Single(holidays.GetHolidays());
+            Assert.Equal(1, holidays.CountHolidays());
             
         }
-
         [Fact]
-        public void GetHolidaysOfColaborator_Should_Return_Holidays_Of_Specified_Colaborator()
+        public void GetHolidaysOfColaborator_ReturnsHolidaysOfColaborator()
         {
             // Arrange
-            var colaborator = new Mock<IColaborator>().Object;
-            var holiday1 = new Holiday(colaborator);
-            var holiday2 = new Holiday(colaborator);
-            var holidaysList = new List<IHoliday>() { holiday1, holiday2 };
-            var holidays = new Holidays(holidaysList);
+            var colaboratorMock = new Mock<IColaborator>();
+            var holiday1Mock = new Mock<IHoliday>();
+            var holiday2Mock = new Mock<IHoliday>();
 
-            // Act
-            var result = holidays.GetHolidaysOfColaborator(colaborator);
+            // Mock IsColaboradorInHoliday method to return true for the first holiday and false for the second
+            holiday1Mock.Setup(h => h.IsColaboradorInHoliday(colaboratorMock.Object)).Returns(true);
+            holiday2Mock.Setup(h => h.IsColaboradorInHoliday(colaboratorMock.Object)).Returns(false);
 
-            // Assert
-            Assert.Equal(2, result.Count);
-            Assert.Contains(holiday1, result);
-            Assert.Contains(holiday2, result);
-        }
-
-        [Fact]
-        public void GetHolidaysByColaborator_Should_Return_Holidays_By_Specified_Colaborator()
-        {
-            // Arrange
-            var colaborator = new Mock<IColaborator>().Object;
-            var colaborator2 = new Mock<IColaborator>().Object;
-            var holiday1 = new Holiday(colaborator);
-            var holiday2 = new Holiday(colaborator);
-            var holiday3 = new Holiday(colaborator2);
-            var holidaysList = new List<IHoliday>() { holiday1, holiday2, holiday3 };
-            var holidays = new Holidays(holidaysList);
-
-            // Act
-            var result = holidays.GetHolidaysByColaborator(colaborator);
-
-            // Assert
-            Assert.Equal(2, result.Count);
-            Assert.Contains(holiday1, result);
-            Assert.Contains(holiday2, result);
-            Assert.DoesNotContain(holiday3, result);
-        }
-
-        [Fact]
-        public void IsColaboratorInProject_Should_Return_True_If_Colaborator_Is_In_Project()
-        {
-            // Arrange
-            DateOnly initialDate = DateOnly.MinValue;
-            DateOnly FinalDate = DateOnly.MaxValue;
-            var project = new Mock<IProject>();
-            var colaborator = new Mock<IColaborator>().Object;
-            var holidays = new Holidays(new List<IHoliday>());
-            var associateMock = new Mock<IAssociate>();
-            associateMock.SetupGet(a => a.Colaborator).Returns(colaborator);
-            var associates = new List<IAssociate> { associateMock.Object };
-            project.Setup(p => p.GetAssociations()).Returns(associates);
-
-            // Act
-            var result = holidays.IsColaboratorInProject(colaborator, project.Object);
-
-            // Assert
-            Assert.True(result);
-        }
-
-        [Fact]
-        public void IsColaboratorInProject_Should_Return_False_If_Colaborator_Is_Not_In_Project()
-        {
-            // Arrange
-            DateOnly initialDate = DateOnly.MinValue;
-            DateOnly FinalDate = DateOnly.MaxValue;
-            var project = new Mock<IProject>();
-            var colaborator = new Mock<IColaborator>().Object;
-            var holidays = new Holidays(new List<IHoliday>());
-            var associateMock = new Mock<IAssociate>();
-            var associations = new List<IAssociate> { associateMock.Object };
-            project.Setup(p => p.GetAssociations()).Returns(associations);
-           
-
-            // Act
-            var result = holidays.IsColaboratorInProject(colaborator, project.Object);
-
-            // Assert
-            Assert.False(result);
-        }
-
-        [Fact]
-        public void GetDaysOfHolidayFromProjectOfColaborator_Should_Return_Correct_Days()
-        {
-            // Arrange
+            var factoryMock = new Mock<IFactoryHoliday>();
+            factoryMock.Setup(f => f.newHoliday(colaboratorMock.Object)).Returns(holiday1Mock.Object);
             
-            var colaborator = new Mock<IColaborator>().Object;
-            var holiday1 = new Holiday(colaborator);
-            var holiday2 = new Holiday(colaborator);
-            var holidaysList = new List<IHoliday>() { holiday1, holiday2 };
-            var holidays = new Holidays(holidaysList);
-            DateOnly initialDate = DateOnly.MinValue;
-            DateOnly FinalDate = DateOnly.MaxValue;
-            var project = new Mock<IProject>();
-            var associateMock = new Mock<IAssociate>();
-            associateMock.SetupGet(a => a.Colaborator).Returns(colaborator);
-            var associates = new List<IAssociate> { associateMock.Object };
-            project.Setup(p => p.GetAssociations()).Returns(associates);
+                    
 
+            var holidaysInstance = new Holidays(factoryMock.Object);
+            holidaysInstance.addHoliday(colaboratorMock.Object);
 
             // Act
-            var result = holidays.GetDaysOfHolidayFromProjectOfColaborator(DateOnly.MinValue, DateOnly.MaxValue, colaborator, project.Object);
+            var result = holidaysInstance.GetHolidaysOfColaborator(colaboratorMock.Object);
 
             // Assert
-            Assert.Equal(0, result); // Assuming no periods intersect with project dates
+            Assert.Collection(result,
+                item => Assert.Same(holiday1Mock.Object, item)); 
         }
 
         [Fact]
-        public void GetDaysOfHolidayFromProjectOfAll_Should_Return_Correct_Days()
+        public void GetDaysOfHolidayFromProjectOfColaborator_When_Colaborator_Not_In_Project_Should_Return_Zero()
         {
             // Arrange
-            var colaborator = new Mock<IColaborator>().Object;
             var project = new Mock<IProject>();
-            var holiday1 = new Holiday(colaborator);
-            var holiday2 = new Holiday(colaborator);
-            var holidaysList = new List<IHoliday>() { holiday1, holiday2 };
-            var associateMock = new Mock<IAssociate>();
-            associateMock.SetupGet(a => a.Colaborator).Returns(colaborator);
-            var holidays = new Holidays(holidaysList);
-            var associates = new List<IAssociate> { associateMock.Object };
-            project.Setup(p => p.GetAssociations()).Returns(associates);
+            project.Setup(p => p.IsColaboratorInProject(It.IsAny<IColaborator>())).Returns(false);
+            var holidays = new Holidays(new Mock<IFactoryHoliday>().Object);
 
             // Act
-            var result = holidays.GetDaysOfHolidayFromProjectOfAll(DateOnly.MinValue, DateOnly.MaxValue, project.Object);
-
-            // Assert
-            Assert.Equal(0, result); // Assuming no periods intersect with project dates
-        }
-
-        [Fact]
-        public void GetDaysOfHolidayFromProjectOfAll_Should_Return_Zero_When_No_Holidays_Overlap_Project_Period()
-        {
-            // Arrange
-            DateOnly projectStartDate = new DateOnly(2024, 1, 1);
-            DateOnly projectEndDate = new DateOnly(2024, 1, 10);
-            var project = new Mock<IProject>();
-            var associateMock = new Mock<IAssociate>();
-            var associates = new List<IAssociate> { associateMock.Object };
-            project.Setup(p => p.GetAssociations()).Returns(associates);
-            project.SetupGet(p => p._dateStart).Returns(projectStartDate);
-            project.SetupGet(p => p._dateEnd).Returns(projectEndDate);
-
-            var holidaysList = new List<IHoliday>(); // Empty list of holidays
-            var holidays = new Holidays(holidaysList);
-
-            // Act
-            var result = holidays.GetDaysOfHolidayFromProjectOfAll(projectStartDate, projectEndDate, project.Object);
+            var result = holidays.GetDaysOfHolidayFromProjectOfColaborator(new DateOnly(2024, 1, 1), new DateOnly(2024, 1, 12), new Mock<IColaborator>().Object, project.Object);
 
             // Assert
             Assert.Equal(0, result);
         }
-
-        
-
-
         [Fact]
-        public void GetDaysOfHolidayFromProjectOfAll_Should_Return_Correct_Days_When_Holidays_Overlap_Project_Period2()
+        public void GetDaysOfHolidayFromProjectOfColaborator_When_Project_Period_Is_Null_Should_Return_Zero()
         {
             // Arrange
             var project = new Mock<IProject>();
-            project.Setup(p => p._dateStart).Returns(new DateOnly(2024, 1, 1));
-            project.Setup(p => p._dateEnd).Returns(new DateOnly(2024, 1, 10));
-            var associateMock = new Mock<IAssociate>();
-            var associates = new List<IAssociate> { associateMock.Object };
-            project.Setup(p => p.GetAssociations()).Returns(associates);
-            var holiday1 = new Mock<IHoliday>();
-            var holiday2 = new Mock<IHoliday>();
-            var holidayPeriod1 = new HolidayPeriod(new DateOnly(2023, 12, 30), new DateOnly(2024, 1, 2));
-            var holidayPeriod2 = new HolidayPeriod(new DateOnly(2024, 1, 3), new DateOnly(2024, 1, 5));
-            holiday1.Setup(h => h.GetHolidayPeriods()).Returns(new List<HolidayPeriod> { holidayPeriod1 });
-            holiday2.Setup(h => h.GetHolidayPeriods()).Returns(new List<HolidayPeriod> { holidayPeriod2 });
-            var holidaysList = new List<IHoliday> { holiday1.Object, holiday2.Object };
-            var holidays = new Holidays(holidaysList);
+            project.Setup(p => p.GetPeriodInsideProject(It.IsAny<DateOnly>(), It.IsAny<DateOnly>())).Returns((List<DateOnly>)null);
+            var holidays = new Holidays(new Mock<IFactoryHoliday>().Object);
 
             // Act
-            var result = holidays.GetDaysOfHolidayFromProjectOfAll(new DateOnly(2024, 1, 1), new DateOnly(2024, 1, 12), project.Object);
+            var result = holidays.GetDaysOfHolidayFromProjectOfColaborator(new DateOnly(2024, 1, 1), new DateOnly(2024, 1, 12), new Mock<IColaborator>().Object, project.Object);
+
+            // Assert
+            Assert.Equal(0, result);
+        }
+                
+        [Fact]
+        public void GetDaysOfHolidayFromProjectOfColaborator_ColaboratorInProjectWithHolidays_ReturnsCorrectDays()
+        {
+            // Arrange
+            var colabDouble = new Mock<IColaborator>();
+            var projectMock = new Mock<IProject>();
+            projectMock.Setup(p => p.IsColaboratorInProject(It.IsAny<IColaborator>())).Returns(true);
+            projectMock.Setup(p => p.GetPeriodInsideProject(It.IsAny<DateOnly>(), It.IsAny<DateOnly>())).Returns(new List<DateOnly> { DateOnly.MinValue, DateOnly.MaxValue });
+
+            var holidayMock = new Mock<IHoliday>();
+            holidayMock.Setup(h => h.IsColaboradorInHoliday(It.IsAny<IColaborator>())).Returns(true);
+            holidayMock.Setup(h => h.GetDaysOfHolidayInsidePeriod(It.IsAny<DateOnly>(), It.IsAny<DateOnly>())).Returns(5);
+
+            var factoryMock = new Mock<IFactoryHoliday>();
+            factoryMock.Setup(f => f.newHoliday(colabDouble.Object)).Returns(holidayMock.Object);
+
+
+            var holidays = new Holidays(factoryMock.Object); 
+            holidays.addHoliday(colabDouble.Object); // Add mocked holiday to the holidays list
+            var result = holidays.GetDaysOfHolidayFromProjectOfColaborator(DateOnly.MinValue, DateOnly.MaxValue, null, projectMock.Object);
 
             // Assert
             Assert.Equal(5, result);
         }
+
+        [Fact]
+        public void GetDaysOfHolidayFromProjectOfAll_ReturnsTotalHolidayDays()
+        {
+            // Arrange
+            var startDate = new DateOnly(2024, 1, 1);
+            var endDate = new DateOnly(2024, 1, 31);
+            var projectMock = new Mock<IProject>();
+            var colaborator1Mock = new Mock<IColaborator>();
+            var colaborator2Mock = new Mock<IColaborator>();
+            var factoryMock = new Mock<IFactoryHoliday>();
+          
+           
+            projectMock.Setup(p => p.IsColaboratorInProject(It.IsAny<IColaborator>())).Returns(true);
+            projectMock.Setup(p => p.GetPeriodInsideProject(It.IsAny<DateOnly>(), It.IsAny<DateOnly>())).Returns(new List<DateOnly> { DateOnly.MinValue, DateOnly.MaxValue });
+
+            // Set up return values for the collaborators
+            var colaborators = new List<IColaborator> { colaborator1Mock.Object, colaborator2Mock.Object };
+            projectMock.Setup(p => p.GetColabortorInPeriod(startDate, endDate)).Returns(colaborators);
+
+            // Set up return values for the holidays
+            var holiday1Mock = new Mock<IHoliday>();
+            holiday1Mock.Setup(h => h.IsColaboradorInHoliday(colaborator1Mock.Object)).Returns(true);
+            holiday1Mock.Setup(h => h.GetDaysOfHolidayInsidePeriod(It.IsAny<DateOnly>(), It.IsAny<DateOnly>())).Returns(5);
+            var holiday2Mock = new Mock<IHoliday>();
+            holiday2Mock.Setup(h => h.IsColaboradorInHoliday(colaborator2Mock.Object)).Returns(true);
+            holiday2Mock.Setup(h => h.GetDaysOfHolidayInsidePeriod(It.IsAny<DateOnly>(), It.IsAny<DateOnly>())).Returns(10);
+           
+            factoryMock.Setup(f => f.newHoliday(colaborator1Mock.Object)).Returns(holiday1Mock.Object);
+            factoryMock.Setup(f => f.newHoliday(colaborator2Mock.Object)).Returns(holiday2Mock.Object);
+
+            // Set up return values for GetDaysOfHolidayFromProjectOfColaborator method
+            
+            var holidaysInstance = new Holidays(factoryMock.Object);
+            holidaysInstance.addHoliday(colaborator1Mock.Object);
+            holidaysInstance.addHoliday(colaborator2Mock.Object);
+
+
+            // Act
+            var result = holidaysInstance.GetDaysOfHolidayFromProjectOfAll(startDate, endDate, projectMock.Object);
+
+            // Assert
+            Assert.Equal(5 + 10, result);
+        }
+
+        [Fact]
+        public void GetColaboratorsWithMoreThen_ReturnsColaboratorsWithMoreThanXDays()
+        {
+            // Arrange
+            var XDays = 5;
+            var colaborator1Mock = new Mock<IColaborator>();
+            var colaborator2Mock = new Mock<IColaborator>();
+            var holiday1Mock = new Mock<IHoliday>();
+            var holiday2Mock = new Mock<IHoliday>();
+
+            // Set up return values for holiday methods
+            holiday1Mock.Setup(h => h.GetColaboratorwithMoreThen(XDays)).Returns(colaborator1Mock.Object);
+            holiday2Mock.Setup(h => h.GetColaboratorwithMoreThen(XDays)).Returns(colaborator2Mock.Object);
+
+            var holidays = new List<IHoliday> { holiday1Mock.Object, holiday2Mock.Object };
+            var factoryMock = new Mock<IFactoryHoliday>();
+
+            // Set up factory mock
+            factoryMock.Setup(f => f.newHoliday(colaborator1Mock.Object)).Returns(holiday1Mock.Object);
+            factoryMock.Setup(f => f.newHoliday(colaborator2Mock.Object)).Returns(holiday2Mock.Object);
+
+            var holidaysInstance = new Holidays(factoryMock.Object);
+
+            // Inject holidays into the holidays instance
+            holidaysInstance.addHoliday(colaborator1Mock.Object);
+            holidaysInstance.addHoliday(colaborator2Mock.Object);
+
+            // Act
+            var result = holidaysInstance.GetColaboratorsWithMoreThen(XDays);
+
+            // Assert
+            Assert.Collection(result,
+                item => Assert.Same(colaborator1Mock.Object, item),
+                item => Assert.Same(colaborator2Mock.Object, item)
+            );
+        }
+
+        [Fact]
+        public void GetColaboratorsWithMoreThen_ReturnsNoColaborators()
+        {
+            // Arrange
+            var XDays = 5;
+            var colaborator1Mock = new Mock<IColaborator>();
+            var colaborator2Mock = new Mock<IColaborator>();
+            var holiday1Mock = new Mock<IHoliday>();
+            var holiday2Mock = new Mock<IHoliday>();
+
+            // Set up return values for holiday methods
+            holiday1Mock.Setup(h => h.GetColaboratorwithMoreThen(2)).Returns(colaborator1Mock.Object);
+            holiday2Mock.Setup(h => h.GetColaboratorwithMoreThen(3)).Returns(colaborator2Mock.Object);
+
+            var holidays = new List<IHoliday> { holiday1Mock.Object, holiday2Mock.Object };
+            var factoryMock = new Mock<IFactoryHoliday>();
+
+            // Set up factory mock
+            factoryMock.Setup(f => f.newHoliday(colaborator1Mock.Object)).Returns(holiday1Mock.Object);
+            factoryMock.Setup(f => f.newHoliday(colaborator2Mock.Object)).Returns(holiday2Mock.Object);
+
+            var holidaysInstance = new Holidays(factoryMock.Object);
+
+            // Inject holidays into the holidays instance
+            holidaysInstance.addHoliday(colaborator1Mock.Object);
+            holidaysInstance.addHoliday(colaborator2Mock.Object);
+
+            // Act
+            var result = holidaysInstance.GetColaboratorsWithMoreThen(XDays);
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+        // [Fact]
+        // public void GetPeriodsOfHolidaysOfColaboratorInPeriod_ReturnsHolidayPeriods()
+        // {
+        //     // Arrange
+        //     var startDate = new DateOnly(2024, 1, 1);
+        //     var endDate = new DateOnly(2024, 1, 31);
+        //     var colaboratorMock = new Mock<IColaborator>();
+        //     var holiday1Mock = new Mock<IHoliday>();
+        //     var holiday2Mock = new Mock<IHoliday>();
+        //     var factoryMock = new Mock<IFactoryHoliday>();
+        //     var holidayPeriodMock = new Mock<HolidayPeriod>();
+
+        //     var holidays = new List<IHoliday> { holiday1Mock.Object, holiday2Mock.Object };
+
+            
+        //     factoryMock.Setup(f => f.newHoliday(colaboratorMock.Object)).Returns(holiday1Mock.Object);
+        //     factoryMock.Setup(f => f.newHoliday(colaboratorMock.Object)).Returns(holiday2Mock.Object);
+        //     holiday1Mock.Setup(h => h.IsColaboradorInHoliday(colaboratorMock.Object)).Returns(true);
+        //     holiday1Mock.Setup(h => h.GetHolidayPeriod(startDate,endDate)).Returns(new List<HolidayPeriod>(holidayPeriodMock.Object));
+        //     holiday2Mock.Setup(h => h.IsColaboradorInHoliday(colaboratorMock.Object)).Returns(true);
+        //     holiday2Mock.Setup(h => h.IsColaboradorInHoliday(colaboratorMock.Object)).Returns(true);
+        //     var holidaysInstance = new Holidays(factoryMock.Object);
+
+        //     // Set up return values for GetHolidayPeriod method of each holiday mock
+        //     var holidayPeriod1Mock = new Mock<HolidayPeriod>();
+        //     var holidayPeriod2Mock = new Mock<HolidayPeriod>();
+
+        //     holidaysInstance.addHoliday(colaboratorMock.Object);
+        //     holidaysInstance.addHoliday(colaboratorMock.Object);
+
+        //     //GetHolidaysOfColaborator
+
+        //     // Act
+        //     var result = holidaysInstance.GetPeriodsOfHolidaysOfColaboratorInPeriod(colaboratorMock.Object, startDate, endDate);
+
+        //     // Assert
+        //     Assert.Collection(result,
+        //         item => Assert.Same(holidayPeriod1Mock.Object, item),
+        //         item => Assert.Same(holidayPeriod2Mock.Object, item)
+        //     );
+        //}
+
+
+
     }
 }

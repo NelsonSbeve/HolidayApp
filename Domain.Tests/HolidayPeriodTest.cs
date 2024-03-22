@@ -10,7 +10,7 @@ namespace Domain.Tests
     public class HolidayPeriodTest
     {
         [Theory]
-        [InlineData(2023, 12, 1, 2023, 12, 31)] // Valid range: start date is before end date
+        [InlineData(2023, 12, 1, 2023, 12, 31)] 
         public void Constructor_WithValidStartAndEndDate_CreatesInstance(int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay)
         {
             // Arrange
@@ -26,8 +26,8 @@ namespace Domain.Tests
         }
  
         [Theory]
-        [InlineData(2023, 12, 31, 2023, 12, 1)] // Invalid range: start date is after end date
-        [InlineData(2023, 12, 31, 2023, 12, 31)] // Invalid range: start date is equal to end date
+        [InlineData(2023, 12, 31, 2023, 12, 1)] 
+        [InlineData(2023, 12, 31, 2023, 12, 31)] 
         public void Constructor_WithInvalidStartOrEndDate_ThrowsArgumentException(int startYear, int startMonth, int startDay, int endYear, int endMonth, int endDay)
         {
             // Arrange
