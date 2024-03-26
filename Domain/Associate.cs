@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+
 namespace Domain
 {
     public class Associate : IAssociate
@@ -46,7 +47,7 @@ namespace Domain
         public bool IsAssociateInPeriod(DateOnly startDate, DateOnly endDate)
         {
             if (DateStart >= startDate && DateEnd <= endDate ||
-            DateStart <= startDate && DateEnd > startDate ||
+            DateStart <= startDate && DateEnd >= startDate ||
             DateStart < endDate && DateEnd >= endDate)
             {
                 return true;

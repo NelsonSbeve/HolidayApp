@@ -17,7 +17,8 @@ public class HolidayTest
     [Fact]
     public void WhenPassingNullAsColaborator_ThenThrowsException()
     {
-        Assert.Throws<ArgumentException>(() => new Holiday(null));
+        var ex = Assert.Throws<ArgumentException>(() => new Holiday(null));
+        Assert.Equal("Invalid argument: colaborator must be non null", ex.Message);
     }
 
     [Fact]
@@ -34,107 +35,12 @@ public class HolidayTest
 
         //assert
         Assert.NotNull(result);
-        Assert.Equal(initialDate,result._startDate);
-        Assert.Equal(FinalDate,result._endDate);
+        Assert.Equal(initialDate,result.getStartDate());
+        Assert.Equal(FinalDate,result.getEndDate());
 
     }
 
-    [Fact]
-
-    public void WhenGetPeriod_ThenReturnPeriod(){
-        
-        // arrange
-        DateOnly initialDate = DateOnly.MinValue;
-        DateOnly FinalDate = DateOnly.MaxValue;
-        Mock<IColaborator> colabDouble = new Mock<IColaborator>();
-        var holiday = new Holiday(colabDouble.Object);
-        List<HolidayPeriod> result = [holiday.addHolidayPeriod(initialDate, FinalDate)];
-
-
-        
-
-       //act
-        List<HolidayPeriod> holidayPeriods = holiday.GetHolidayPeriod(initialDate, FinalDate);
-       
-
-
-        //assert
-        Assert.Equivalent(result, holidayPeriods);
-
-    }
-
-    [Fact]
-    public void GetHolidayPeriods_Should_Return_Correct_List()
-    {
-
-
-        //Arrange
-
-        DateOnly initialDate = DateOnly.MinValue;
-        DateOnly FinalDate = DateOnly.MaxValue;
-        Mock<IColaborator> colabDouble = new Mock<IColaborator>();
-        var holiday = new Holiday(colabDouble.Object);
-        List<HolidayPeriod> holidayPeriods = [holiday.addHolidayPeriod(initialDate, FinalDate)];
-
-        
-
-        // Act
-        var result = holiday.GetHolidayPeriod(initialDate, FinalDate);
-
-        // Assert
-        Assert.Equal(holidayPeriods, result);
-    }
-
-    [Fact]
-    public void GetHolidayPeriod_Should_Return_Empty_List_When_No_Periods_Exist()
-    {
-        // Arrange
-        var mockColaborator = new Mock<IColaborator>();
-        var holiday = new Holiday(mockColaborator.Object);
-
-        // Act
-        var result = holiday.GetHolidayPeriod(DateOnly.MinValue, DateOnly.MaxValue);
-
-        // Assert
-        Assert.Empty(result);
-    }
-
-    [Fact]
-    public void GetHolidayPeriod_Should_Return_Empty_List_When_No_Periods_Match()
-    {
-        // Arrange
-        var mockColaborator = new Mock<IColaborator>();
-        var holiday = new Holiday(mockColaborator.Object);
-        holiday.addHolidayPeriod(DateOnly.MinValue, DateOnly.MaxValue); 
-
-        // Act
-        var result = holiday.GetHolidayPeriod(new DateOnly(2024, 3, 18), new DateOnly(2024, 3, 25));
-
-        // Assert
-        Assert.Empty(result);
-    }
-
-    [Fact]
-    public void GetHolidayPeriod_Should_Return_Matching_Periods()
-    {
-        // Arrange
-        var mockColaborator = new Mock<IColaborator>();
-        var holiday = new Holiday(mockColaborator.Object);
-        var startDate = new DateOnly(2024, 3, 18);
-        var endDate = new DateOnly(2024, 3, 25);
-        var matchingPeriod = new HolidayPeriod(startDate, endDate);
-        var nonMatchingPeriod = new HolidayPeriod(DateOnly.MinValue, DateOnly.MaxValue);
-        holiday.addHolidayPeriod(startDate, endDate);
-        holiday.addHolidayPeriod(DateOnly.MinValue, DateOnly.MaxValue);
-
-        // Act
-        var result = holiday.GetHolidayPeriod(startDate, endDate);
-
-        // Assert
-        Assert.Single(result);
-        Assert.Equivalent(matchingPeriod, result[0]);
-    }
-
+    
     [Theory]
     [InlineData("2024-01-01", "2024-01-31", "2024-01-01", "2024-01-31", 31)] 
     [InlineData("2024-01-01", "2024-01-31", "2024-01-15", "2024-01-20", 6)] 
@@ -207,14 +113,17 @@ public class HolidayTest
         holiday.addHolidayPeriod(Start, End);
         var xDays = 20; 
         var Xdays2= 5;
+        var Xdays3 = 9;
 
         // Act
         var result = holiday.GetColaboratorwithMoreThen(xDays);
         var result2 = holiday.GetColaboratorwithMoreThen(Xdays2);
+        var result3 = holiday.GetColaboratorwithMoreThen(Xdays3);
 
         // Assert
         Assert.Null(result);
         Assert.NotNull(result2);
+        Assert.Null(result3);
     }
     [Theory]
     [InlineData(true)]

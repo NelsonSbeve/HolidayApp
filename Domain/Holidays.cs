@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 
+
 namespace Domain
 {
     public class Holidays
@@ -18,15 +19,6 @@ namespace Domain
             _factoryHoliday = fHoliday;
         }
 
-        public int CountHolidays(){
-            int count = 0;
-            foreach(var holiday in holidays){
-                count++;
-            }
-            return count;
-        }
-
-
 
 
         public IHoliday addHoliday(IColaborator colaborator)
@@ -37,20 +29,6 @@ namespace Domain
         }
 
  
-        public List<IHoliday> GetHolidaysOfColaborator(IColaborator colaborator)
-        {
-            List<IHoliday> holidaysOfColaborator = new List<IHoliday>();
-
-            foreach (var holiday in holidays)
-            {
-                if (holiday.IsColaboradorInHoliday(colaborator))
-                {
-                    holidaysOfColaborator.Add(holiday);
-                }
-            }
-
-            return holidaysOfColaborator;
-        }
 
 
         //need fix
@@ -109,27 +87,27 @@ namespace Domain
             return colaboratorsWithMoreThanXDays;
         }
 
-        public List<HolidayPeriod>GetPeriodsOfHolidaysOfColaboratorInPeriod(IColaborator colaborator, DateOnly startDate, DateOnly endDate){
+        // public List<HolidayPeriod>GetPeriodsOfHolidaysOfColaboratorInPeriod(IColaborator colaborator, DateOnly startDate, DateOnly endDate){
 
-            List<HolidayPeriod> holidayPeriods = [];
+        //     List<HolidayPeriod> holidayPeriods = [];
 
-            List<IHoliday> holidayList = GetHolidaysOfColaborator(colaborator);
-            foreach(var holiday in holidayList){
-                List<HolidayPeriod> allHolidayPeriods = holiday.GetHolidayPeriod(startDate,startDate );
+        //     List<IHoliday> holidayList = GetHolidaysOfColaborator(colaborator);
+        //     foreach(var holiday in holidayList){
+        //         List<HolidayPeriod> allHolidayPeriods = holiday.GetHolidayPeriod(startDate,startDate );
 
-                // Filter holiday periods that fall within the specified time period
-                foreach (var period in allHolidayPeriods)
-                {
-                    if (period._startDate >= startDate && period._endDate <= endDate)
-                    {
-                        holidayPeriods.Add(period);
-                    }
-                }
-            }
+        //         // Filter holiday periods that fall within the specified time period
+        //         foreach (var period in allHolidayPeriods)
+        //         {
+        //             if (period._startDate >= startDate && period._endDate <= endDate)
+        //             {
+        //                 holidayPeriods.Add(period);
+        //             }
+        //         }
+        //     }
 
-            return holidayPeriods;
+        //     return holidayPeriods;
 
-        }
+        // }
 
     }
 

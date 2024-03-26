@@ -18,9 +18,13 @@ public class TrainingPeriodTests
  
             // Act
             var trainingPeriod = new TrainingPeriod(startDate, endDate);
+            var endD = trainingPeriod.getEndDate();
+            var startD = trainingPeriod.getStartDate();
  
             // Assert
             Assert.NotNull(trainingPeriod);
+            Assert.Equal(endDate, endD);
+            Assert.Equal(startDate, startD);
         }
  
         [Theory]
@@ -33,7 +37,8 @@ public class TrainingPeriodTests
             var endDate = new DateOnly(endYear, endMonth, endDay);
  
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => new TrainingPeriod(startDate, endDate));
+            var ex = Assert.Throws<ArgumentException>(() => new TrainingPeriod(startDate, endDate));
+            Assert.Equal("invalid arguments: start date >= end date.", ex.Message);
         }
     }
 }

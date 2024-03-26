@@ -13,7 +13,24 @@ namespace Domain.Tests
     [InlineData("a", 1)]
     public void WhenPassingCorrectData_ThenSkillIsInstantiated(string Description, int Level)
     {
-        new Skills( Description, Level);
+        var skills = new Skills( Description, Level);
+        Assert.Equal(Description, skills.getDescription());
+    }
+
+    [Theory]
+    [InlineData(1)] // Valid level 1
+    [InlineData(3)] // Valid level 3
+    [InlineData(5)] // Valid level 5
+    public void LevelRange_ValidLevels_ReturnsLevel(int level)
+    {
+        // Arrange
+        var skills = new Skills("descrição", level);
+
+        // Act
+        var result = skills.LevelRange(level);
+
+        // Assert
+        Assert.Equal(level, result);
     }
 
 
@@ -22,7 +39,8 @@ namespace Domain.Tests
     [InlineData("a", 10)]
     public void WhenPassingInvalidLevel_ThenThrowsException(string Description, int Level)
     {
-        Assert.Throws<ArgumentException>(() =>new Skills(Description, Level));
+        var ex = Assert.Throws<ArgumentException>(() =>new Skills(Description, Level));
+        Assert.Equal("Invalid arguments.", ex.Message);
     }
 
 
@@ -32,8 +50,11 @@ namespace Domain.Tests
     [InlineData(null, 2)]
     public void WhenPassingInvalidDescription_ThenThrowsException(string Description, int Level)
     {
-        Assert.Throws<ArgumentException>(() =>new Skills(Description, Level));
+         var ex = Assert.Throws<ArgumentException>(() =>new Skills(Description, Level));
+         Assert.Equal("Invalid arguments.", ex.Message);
     }
+
+
 
     }
 }

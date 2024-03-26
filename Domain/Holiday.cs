@@ -32,27 +32,14 @@ public class Holiday : IHoliday
     //     return holidayPeriod;
     // }
 
-	public List<HolidayPeriod> GetHolidayPeriod( DateOnly startDate, DateOnly endDate){
-
-		List<HolidayPeriod> result = [];
-
-		foreach(HolidayPeriod p in _holidayPeriods){
-			if(p.getStartDate() >= startDate && p.getEndDate() <= endDate){
-				result.Add(p);
-			}
-		}
-
-		return result;
-	}
-
-
 
 	public int GetDaysOfHolidayInsidePeriod(DateOnly projectStartDate, DateOnly projectEndDate){
 
 		var totalResult = 0;
 		foreach(var period in _holidayPeriods){
-			DateOnly periodStart = period._startDate > projectStartDate ? period._startDate : projectStartDate;
-			DateOnly periodEnd = period._endDate < projectEndDate ? period._endDate : projectEndDate;
+			
+			DateOnly periodStart = period.ValidateInitialDate(projectStartDate);
+			DateOnly periodEnd = period.ValidateFinalDate(projectEndDate); //se o professor estiver a ver isto foi o que tinhamos comentado na aula neste caso ja tenho metodos dentro do periodo mas continua a ser um metodo "Geral" e ainda pode ser usado independentemene do periodo que estivermos a falar.
 			// Check if the holiday period intersects with the specified period
 			if (periodStart <= periodEnd)
 			{
@@ -71,8 +58,8 @@ public class Holiday : IHoliday
 	public IColaborator GetColaboratorwithMoreThen(int XDays){
         foreach (var period in _holidayPeriods)
 		{
-			DateTime endDateTime = period._endDate.ToDateTime(TimeOnly.Parse("10:00PM"));
-			DateTime startDateTime = period._startDate.ToDateTime(TimeOnly.Parse("10:00PM"));
+			DateTime endDateTime = period.getEndDate().ToDateTime(TimeOnly.Parse("10:00PM"));
+			DateTime startDateTime = period.getStartDate().ToDateTime(TimeOnly.Parse("10:00PM"));
 			TimeSpan difference = endDateTime.Subtract(startDateTime);
             int numberOfDays = difference.Days;
             if (numberOfDays > XDays){

@@ -16,7 +16,8 @@ public class TrainingTest
             string description = "Valid Description";
  
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => new Training(description, colab!));
+            var ex = Assert.Throws<ArgumentException>(() => new Training(description, colab!));
+            Assert.Equal("Invalid argument: colaborator must be non null", ex.Message);
         }
  
         [Theory]
@@ -29,7 +30,8 @@ public class TrainingTest
             var colabMock = new Mock<IColaborator>();
  
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => new Training(description!, colabMock.Object));
+            var ex = Assert.Throws<ArgumentException>(() => new Training(description!, colabMock.Object));
+            Assert.Equal("Invalid description.", ex.Message);
         }
 
         [Theory]

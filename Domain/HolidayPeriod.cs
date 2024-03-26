@@ -4,8 +4,8 @@ namespace Domain;
 
 public class HolidayPeriod 
 {
-	public DateOnly _startDate;
-	public DateOnly _endDate;
+	private DateOnly _startDate;
+	private DateOnly _endDate;
 
 	int _status;
 
@@ -24,6 +24,18 @@ public class HolidayPeriod
 	// 	return days;
 
 	// }
+	public DateOnly ValidateInitialDate(DateOnly Date)
+    {
+        var StartDate = _startDate >= Date ? _startDate : Date;
+        
+		return StartDate;
+    }
+
+	public DateOnly ValidateFinalDate( DateOnly Date)
+	{
+		var EndDate = _endDate <= Date ? _endDate : Date;
+		return EndDate;
+	}
 
 	public DateOnly getStartDate(){
 		return _startDate;

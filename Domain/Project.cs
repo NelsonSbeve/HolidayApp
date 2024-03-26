@@ -30,7 +30,7 @@ namespace Domain
         {
             if (colaborator == null)
             {
-                throw new ArgumentNullException(nameof(colaborator));
+                throw new ArgumentException("colaborator cant be null.");
             }
 
             // Create a new associate with the provided colaborator, project, dateStart, and dateEnd
@@ -48,24 +48,24 @@ namespace Domain
             DateOnly projectStartDate = _dateStart > DateStart ? _dateStart : DateStart;
             DateOnly projectEndDate =  _dateEnd < DateEnd ? _dateEnd : DateEnd;
 
-            List<DateOnly> datas = [projectStartDate, projectEndDate];
+            List<DateOnly> dates = [projectStartDate, projectEndDate];
 
 
 
-            return datas;
+            return dates;
         }
         public bool IsColaboratorInProject(IColaborator colaborator)
         {          
-            var colaboratorInProject = false;
+            
             // Iterate through the list of associations
             foreach (var associate in _associations)
             {
                 // Check if the collaborator matches the one in the current association
-                colaboratorInProject = associate.IsColaboratorInProject(colaborator);
-                if(true)
-                break;
+                
+                if(associate.IsColaboratorInProject(colaborator))
+                return true;
             }           
-            return colaboratorInProject;
+            return false;
         }
 
         public List<IColaborator> GetColabortorInPeriod(DateOnly startDate, DateOnly endDate)
@@ -80,24 +80,7 @@ namespace Domain
             return colaboradores;
         }
 
-        // public int GetDaysOfHolidayFromProjectOfAll(DateOnly DateStart, DateOnly DateEnd)
-        // {
-        //     int totalResult = 0;
-        //     List<DateOnly> datas = GetPeriodInsideProject(DateStart,DateEnd);
-        //     var projectStartDate = datas[0];
-        //     var projectEndDate = datas[1];
-        //     List<IColaborator> colaborators = GetAssociations();
-        //     foreach (IColaborator colaborator in colaborators)
-        //     {
-        //         List<IHoliday> holidayList = GetHolidaysOfColaborator(colaborator);
 
-        //         foreach (var holiday in holidayList)
-        //         {
-        //             totalResult += holiday.GetDaysOfHolidayInsidePeriod(projectStartDate, projectEndDate);
-        //         }    
-        //     }
-        //     return totalResult;
-        // }
 
 
     }

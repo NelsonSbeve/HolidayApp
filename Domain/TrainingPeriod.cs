@@ -21,5 +21,12 @@ namespace Domain
             else
                 throw new ArgumentException("invalid arguments: start date >= end date.");
         }
+
+        public DateOnly getStartDate(){
+            return _startDate;
+        }
+        public DateOnly getEndDate(){
+            return _endDate;
+        }
     }
 }

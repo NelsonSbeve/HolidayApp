@@ -1,11 +1,13 @@
 ﻿namespace Domain;
 
+
 using System.Net.Mail;
 
 public class Colaborator : IColaborator
-{
-    private string _strName;
-    private object _strEmail;
+{	
+	public int Id { get; set; } 
+    public string _strName {get; set;}
+    public string _strEmail {get; set;}
 
     public Colaborator(string strName, string strEmail) {
 

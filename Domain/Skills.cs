@@ -7,8 +7,8 @@ namespace Domain
 {
     public class Skills
     {
-        public string Description;
-        public int Level;
+        private string Description;
+        private int Level;
 
 
         public Skills(string pDescription, int pLevel){
@@ -29,15 +29,21 @@ namespace Domain
             
         }
 
-        private int LevelRange(int pLevel)
+        public int LevelRange(int pLevel)
         {
             if(Enumerable.Range(1,5).Contains(pLevel)){
                 return pLevel;
             }else{
-             throw new ArgumentException(nameof(pLevel));
+             throw new ArgumentException("Invalid arguments.");
             }
        
         }
+
+        public string getDescription(){
+            string descript = Description;
+            return descript;
+        }
+
 
 
         
