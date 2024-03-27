@@ -49,5 +49,25 @@ public class TrainingTest
             Assert.NotNull(training);
             Assert.Equal(validDescription, training.Description);
         }
+
+        [Fact]
+        public void WhenAddingNewPeriod_ThenPeriodIsAdded()
+        {
+            // arrange
+            DateOnly initialDate = DateOnly.MinValue;
+            DateOnly FinalDate = DateOnly.MaxValue;
+            Mock<IColaborator> colabDouble = new Mock<IColaborator>();
+            var training = new Training("string",colabDouble.Object);
+
+            //act
+            TrainingPeriod result = training.addTrainingPeriod(initialDate, FinalDate);
+
+            //assert
+            Assert.NotNull(result);
+            Assert.Equal(1, training.ListCount());
+            Assert.Equal(initialDate,result.getStartDate());
+            Assert.Equal(FinalDate,result.getEndDate());
+
+        }
     }
 }

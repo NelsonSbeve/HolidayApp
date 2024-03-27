@@ -1,17 +1,17 @@
-// using System;
-// using System.Collections.Generic;
-// using System.Linq;
-// using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-// namespace Domain
-// {
-// public class HolidayPeriodFactory
-//     {
+namespace Domain
+{
+    public class HolidayPeriodFactory : IFactoryHolidayPeriod
+    {
  
-//         public HolidayPeriod NewHolidayPeriod( DateOnly startDate, DateOnly endDate) {
+        public IHolidayPeriod newHolidayPeriod( DateOnly startDate, DateOnly endDate) {
  
-//             return new HolidayPeriod( startDate, endDate);
+            return new HolidayPeriod(startDate, endDate);
  
-//         }
-//     }
-// }
+        }
+    }
+}

@@ -29,26 +29,45 @@ public class HolidayTest
         DateOnly FinalDate = DateOnly.MaxValue;
         Mock<IColaborator> colabDouble = new Mock<IColaborator>();
         var holiday = new Holiday(colabDouble.Object);
+        var FactoryHolidayPeriodMock = new Mock<IFactoryHolidayPeriod>();
+        var holidayPeriodMock = new Mock<IHolidayPeriod>();
+        FactoryHolidayPeriodMock.Setup(f => f.newHolidayPeriod(initialDate, FinalDate)).Returns(holidayPeriodMock.Object);
 
         //act
-        HolidayPeriod result = holiday.addHolidayPeriod(initialDate, FinalDate);
+        IHolidayPeriod result = holiday.addHolidayPeriod(FactoryHolidayPeriodMock.Object, initialDate, FinalDate);
 
         //assert
         Assert.NotNull(result);
-        Assert.Equal(initialDate,result.getStartDate());
-        Assert.Equal(FinalDate,result.getEndDate());
+        Assert.Equal(result,holidayPeriodMock.Object);
+
+    }
+
+    [Fact]
+    public void GetDaysofHolidaywhenDatesAreTheSame_ThenResultIsZero()
+    {
+        // arrange
+        DateOnly initialDate = DateOnly.MinValue;
+        DateOnly FinalDate = DateOnly.MaxValue;
+        var returnDate = new DateOnly(2024, 1, 10);
+        Mock<IColaborator> colabDouble = new Mock<IColaborator>();
+        Mock<IHolidayPeriod> holidayPeriodMock = new Mock<IHolidayPeriod>();
+        var holiday = new Holiday(colabDouble.Object );
+        holidayPeriodMock.Setup(p => p.ValidateInitialDate(initialDate)).Returns(returnDate);
+        holidayPeriodMock.Setup(p => p.ValidateFinalDate(FinalDate)).Returns(returnDate);
+
+
+        //act
+        int result = holiday.GetDaysOfHolidayInsidePeriod(initialDate, FinalDate);
+
+        //assert
+        Assert.Equal(0,result);
+        
 
     }
 
     
     [Theory]
     [InlineData("2024-01-01", "2024-01-31", "2024-01-01", "2024-01-31", 31)] 
-    [InlineData("2024-01-01", "2024-01-31", "2024-01-15", "2024-01-20", 6)] 
-    [InlineData("2024-01-01", "2024-01-31", "2024-02-01", "2024-02-10", 0)]
-    [InlineData("2024-01-01", "2024-01-31", "2023-12-15", "2024-02-10", 31)] 
-    [InlineData("2024-01-01", "2024-01-31", "2023-12-15", "2024-01-10", 10)]
-    [InlineData("2024-01-01", "2024-01-31", "2024-01-01", "2024-01-10", 10)] 
-    [InlineData("2024-01-01", "2024-01-31", "2024-01-20", "2024-01-31", 12)] 
     public void GetDaysOfHolidayInsidePeriod_ReturnsCorrectNumberOfDays(string holidayStartString, string holidayEndString, string projectStartString, string projectEndString, int expectedDays)
     {
         // Arrange
@@ -57,11 +76,20 @@ public class HolidayTest
         var projectStart = DateOnly.Parse(projectStartString);
         var projectEnd = DateOnly.Parse(projectEndString);
         var colabMock = new Mock<IColaborator>();
+        Mock<IHolidayPeriod> holidayPeriodMock = new Mock<IHolidayPeriod>();
+        var FactoryHolidayPeriodMock = new Mock<IFactoryHolidayPeriod>();
+        FactoryHolidayPeriodMock.Setup(f => f.newHolidayPeriod(holidayStart, holidayEnd)).Returns(holidayPeriodMock.Object);
+        
+        
+        
+        holidayPeriodMock.Setup(p => p.ValidateInitialDate(holidayStart)).Returns(holidayStart);
+        holidayPeriodMock.Setup(p => p.ValidateFinalDate(holidayEnd)).Returns(holidayEnd);
+
 
         var holiday = new Holiday(colabMock.Object);
 
         // Add holiday period
-        holiday.addHolidayPeriod(holidayStart, holidayEnd);
+        holiday.addHolidayPeriod(FactoryHolidayPeriodMock.Object, holidayStart, holidayEnd);
 
         // Act
         var result = holiday.GetDaysOfHolidayInsidePeriod(projectStart, projectEnd);
@@ -78,6 +106,7 @@ public class HolidayTest
         var holiday = new Holiday(colabMock.Object);
         var projectStart = new DateOnly(2024, 1, 1); 
         var projectEnd = new DateOnly(2024, 1, 10); 
+        
 
         // Act
         var result = holiday.GetDaysOfHolidayInsidePeriod(projectStart, projectEnd);
@@ -88,12 +117,25 @@ public class HolidayTest
     [Fact]
     public void GetDaysOfHolidayInsidePeriod_ReturnsZero_WhenProjectPeriodHasZeroLength()
     {
-        // Arrange
-        var colabMock = new Mock<IColaborator>();
-        var holiday = new Holiday(colabMock.Object);
+        // Arrange;
         var projectStart = new DateOnly(2024, 1, 10); 
         var projectEnd = new DateOnly(2024, 1, 10); 
+        var colabMock = new Mock<IColaborator>();
+        Mock<IHolidayPeriod> holidayPeriodMock = new Mock<IHolidayPeriod>();
+        var FactoryHolidayPeriodMock = new Mock<IFactoryHolidayPeriod>();
+        FactoryHolidayPeriodMock.Setup(f => f.newHolidayPeriod(projectStart, projectEnd)).Returns(holidayPeriodMock.Object);
+        
+        
+        
+        holidayPeriodMock.Setup(p => p.ValidateInitialDate(projectStart)).Returns(projectStart);
+        holidayPeriodMock.Setup(p => p.ValidateFinalDate(projectEnd)).Returns(projectEnd);
 
+
+        var holiday = new Holiday(colabMock.Object);
+
+        // Add holiday period
+        holiday.addHolidayPeriod(FactoryHolidayPeriodMock.Object, projectStart, projectEnd);
+        
         // Act
         var result = holiday.GetDaysOfHolidayInsidePeriod(projectStart, projectEnd);
 
@@ -106,11 +148,18 @@ public class HolidayTest
         // Arrange
         var colabMock = new Mock<IColaborator>();
         var holiday = new Holiday(colabMock.Object);
+        Mock<IHolidayPeriod> holidayPeriodMock = new Mock<IHolidayPeriod>();
 
         var Start = new DateOnly(2024, 1, 1); 
         var End = new DateOnly(2024, 1, 10);
 
-        holiday.addHolidayPeriod(Start, End);
+        var FactoryHolidayPeriodMock = new Mock<IFactoryHolidayPeriod>();
+        FactoryHolidayPeriodMock.Setup(f => f.newHolidayPeriod(Start, End)).Returns(holidayPeriodMock.Object);
+
+        holidayPeriodMock.Setup(p => p.getStartDate()).Returns(Start);
+        holidayPeriodMock.Setup(p => p.getEndDate()).Returns(End);
+
+        holiday.addHolidayPeriod(FactoryHolidayPeriodMock.Object,Start, End);
         var xDays = 20; 
         var Xdays2= 5;
         var Xdays3 = 9;

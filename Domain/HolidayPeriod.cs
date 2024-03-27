@@ -1,8 +1,9 @@
 using System.Net;
+using Domain;
 
 namespace Domain;
 
-public class HolidayPeriod 
+public class HolidayPeriod : IHolidayPeriod
 {
 	private DateOnly _startDate;
 	private DateOnly _endDate;

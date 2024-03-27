@@ -40,5 +40,7 @@ public class TrainingPeriodTests
             var ex = Assert.Throws<ArgumentException>(() => new TrainingPeriod(startDate, endDate));
             Assert.Equal("invalid arguments: start date >= end date.", ex.Message);
         }
+
+
     }
 }

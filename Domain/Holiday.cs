@@ -5,8 +5,9 @@ namespace Domain;
 public class Holiday : IHoliday
 {
 	private IColaborator _colaborator;
+	
 
-	private List<HolidayPeriod> _holidayPeriods = new List<HolidayPeriod>();
+	private List<IHolidayPeriod> _holidayPeriods = new List<IHolidayPeriod>();
 
 	public Holiday(IColaborator colab)
 	{
@@ -15,19 +16,21 @@ public class Holiday : IHoliday
 		else
 			throw new ArgumentException("Invalid argument: colaborator must be non null");
 
-		
+	
+        
 	}
 
-	public HolidayPeriod addHolidayPeriod(DateOnly startDate, DateOnly endDate) {
+	public IHolidayPeriod addHolidayPeriod(IFactoryHolidayPeriod hpFactory, DateOnly startDate, DateOnly endDate) {
 
-	   HolidayPeriod holiday = new HolidayPeriod(startDate, endDate);
-	   _holidayPeriods.Add(holiday);
-	   return holiday;
+	   
+	   IHolidayPeriod holidayPeriod = hpFactory.newHolidayPeriod(startDate, endDate);
+	   _holidayPeriods.Add(holidayPeriod);
+	   return holidayPeriod;
 	}
-	// public HolidayPeriod AddHolidayPeriod(HolidayPeriodFactory hpFactory, DateOnly startDate, DateOnly endDate)
+	// public IHolidayPeriod AddHolidayPeriod(IFactoryHolidayPeriod hpFactory, DateOnly startDate, DateOnly endDate)
     // {
     //     //HolidayPeriod holidayPeriod = new HolidayPeriod(startDate, endDate);
-    //     HolidayPeriod holidayPeriod = hpFactory.NewHolidayPeriod(startDate, endDate);
+    //     IHolidayPeriod holidayPeriod = hpFactory.newHolidayPeriod(startDate, endDate);
     //     _holidayPeriods.Add(holidayPeriod);
     //     return holidayPeriod;
     // }
@@ -41,7 +44,7 @@ public class Holiday : IHoliday
 			DateOnly periodStart = period.ValidateInitialDate(projectStartDate);
 			DateOnly periodEnd = period.ValidateFinalDate(projectEndDate); //se o professor estiver a ver isto foi o que tinhamos comentado na aula neste caso ja tenho metodos dentro do periodo mas continua a ser um metodo "Geral" e ainda pode ser usado independentemene do periodo que estivermos a falar.
 			// Check if the holiday period intersects with the specified period
-			if (periodStart <= periodEnd)
+			if (periodStart < periodEnd)
 			{
 				// Calculate the number of days within the intersection
 
