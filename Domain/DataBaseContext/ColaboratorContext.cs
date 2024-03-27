@@ -13,5 +13,5 @@ public class ColaboratorContext : DbContext
     {
     }
 
-    public DbSet<Colaborator> Colaborators { get; set; } = null!;
+    public virtual DbSet<Colaborator> Colaborators { get; set; } = null!;
 }

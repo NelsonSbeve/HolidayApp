@@ -21,6 +21,11 @@ namespace WebApi.Controllers
     {
         _context = context;
     }
+
+    private bool ColaboratorExists(int id)
+    {
+        return _context.Colaborators.Any(e => e.Id == id);
+    }
     [HttpPost]
     public async Task<ActionResult<Colaborator>> CreateColaborator(string name, string email)
     {
@@ -42,20 +47,40 @@ namespace WebApi.Controllers
         }
     }
 
-    [HttpGet("{name}")]
-    public async Task<ActionResult<Colaborator>> GetColaboratorByName(string name)
+    // [HttpGet("{name}")]
+    // public async Task<ActionResult<Colaborator>> GetColaboratorByName(string name)
+    // {
+    //     try
+    //     {
+    //         Colaborator collaborator = await _context.Colaborators.FirstOrDefaultAsync(c => c._strName.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+    //         if (collaborator == null)
+    //         {
+    //             return NotFound(); // Return 404 if collaborator with given name is not found
+    //         }
+
+    //         // Return only name and email of the collaborator
+    //         return Ok(new { Name = collaborator._strName, Email = collaborator._strEmail });
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         return StatusCode(500, ex.Message); // Return 500 if any unexpected error occurs
+    //     }
+    // }
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Colaborator>> GetColaboratorById(int id)
     {
         try
         {
-            Colaborator collaborator = await _context.Colaborators.FirstOrDefaultAsync(c => c._strName.Equals(name, StringComparison.OrdinalIgnoreCase));
+            var collaborator = await _context.Colaborators.FindAsync(id);
 
             if (collaborator == null)
             {
-                return NotFound(); // Return 404 if collaborator with given name is not found
+                return NotFound(); // Return 404 if collaborator with given ID is not found
             }
 
-            // Return only name and email of the collaborator
-            return Ok(new { Name = collaborator._strName, Email = collaborator._strEmail });
+            // Return collaborator with 200 OK status code
+            return Ok(collaborator);
         }
         catch (Exception ex)
         {
@@ -63,50 +88,60 @@ namespace WebApi.Controllers
         }
     }
 
-    [HttpPut("{name}")]
-    public async Task<IActionResult> UpdateColaborator(string name, string email)
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutColaborator(int id, string name, string email)
     {
+        var existingColaborator = await _context.Colaborators.FindAsync(id);
+        if (existingColaborator == null)
+        {
+            return NotFound();
+        }
+
+        var colaboratorInstance = new Colaborator(name, email);
+        if (!colaboratorInstance.isValidParameters(name, email))
+        {
+            return BadRequest("Invalid format.");
+        }
+
+        existingColaborator._strName = name;
+        existingColaborator._strEmail = email;
+
         try
         {
-            var collaborator = await _context.Colaborators.FirstOrDefaultAsync(c => c._strName.Equals(name, StringComparison.OrdinalIgnoreCase));
-
-            if (collaborator == null)
-            {
-                return NotFound(); // Return 404 if collaborator with given name is not found
-            }
-
-            collaborator._strEmail = email;
             await _context.SaveChangesAsync();
-
-            return NoContent(); // Return 204 No Content upon successful update
         }
-        catch (Exception ex)
+        catch (DbUpdateConcurrencyException)
         {
-            return StatusCode(500, ex.Message); // Return 500 if any unexpected error occurs
-        }
-    }
-
-    [HttpDelete("{name}")]
-    public async Task<IActionResult> DeleteColaborator(string name)
-    {
-        try
-        {
-            var collaborator = await _context.Colaborators.FirstOrDefaultAsync(c => c._strName.Equals(name, StringComparison.OrdinalIgnoreCase));
-
-            if (collaborator == null)
+            if (!ColaboratorExists(id))
             {
-                return NotFound(); // Return 404 if collaborator with given name is not found
+                return NotFound();
             }
-
-            _context.Colaborators.Remove(collaborator);
-            await _context.SaveChangesAsync();
-
-            return NoContent(); // Return 204 No Content upon successful deletion
+            else
+            {
+                throw;
+            }
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message); // Return 500 if any unexpected error occurs
-        }
+
+        return NoContent();
     }
+
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteColaborator(int id)
+    {
+        var colaborator = await _context.Colaborators.FindAsync(id);
+        if (colaborator == null)
+        {
+            return NotFound();
+        }
+
+        _context.Colaborators.Remove(colaborator);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    
     }
 }

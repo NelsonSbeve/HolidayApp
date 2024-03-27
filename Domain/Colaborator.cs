@@ -21,7 +21,7 @@ public class Colaborator : IColaborator
 
 
 	
-	private bool isValidParameters(string strName, string strEmail) {
+	public bool isValidParameters(string strName, string strEmail) {
 
 		if( strName==null ||
 			strName.Length > 50 ||
@@ -41,7 +41,7 @@ public class Colaborator : IColaborator
 	}
 
 	// from https://mailtrap.io/blog/validate-email-address-c/
-	private bool IsValidEmailAddres(string email)
+	public bool IsValidEmailAddres(string email)
 	{
 		var valid = true;
 
