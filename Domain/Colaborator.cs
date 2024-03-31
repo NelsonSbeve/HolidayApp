@@ -9,6 +9,8 @@ public class Colaborator : IColaborator
     public string _strName {get; set;}
     public string _strEmail {get; set;}
 
+
+	
     public Colaborator(string strName, string strEmail) {
 
 		if( isValidParameters(strName, strEmail) ) {

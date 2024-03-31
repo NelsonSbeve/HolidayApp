@@ -2,16 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Interfaces;
 
 namespace Domain
 {
-    public class Skills
+    public class Skills : ISkills
     {
-        private string Description;
         private int Level;
+        private string Description;
+        
 
 
-        public Skills(string pDescription, int pLevel){
+        public Skills(int pLevel, string pDescription ){
 
             Description = DescriptionVerification(pDescription);
             Level = LevelRange(pLevel);
