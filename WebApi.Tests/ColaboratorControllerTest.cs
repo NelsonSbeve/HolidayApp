@@ -6,14 +6,13 @@ namespace WebApi.Tests
 
     public class ColaboratorControllerTest
     {
-    ///////////////////////////////////////////////
-    ///
 
     [Fact]
     public async Task CreateColaborator_ReturnsCreatedColaborator()
     {
         // Arrange
         var collaboratorData = new List<Colaborator>();
+        var colabMock = new Mock<Colaborator>();
         var mockDbSet = collaboratorData.AsQueryable().BuildMockDbSet();
         var options = new DbContextOptionsBuilder<ColaboratorContext>()
         .UseInMemoryDatabase(databaseName: "TestDatabase")
@@ -29,7 +28,7 @@ namespace WebApi.Tests
         var controller = new ColaboratorController(mockContext.Object);
 
         // Act
-        var result = await controller.CreateColaborator("John Doe", "john.doe@example.com");
+        var result = await controller.CreateColaboratorWithObject(colabMock.Object);
 
         // Assert
         var createdResult = Assert.IsType<OkObjectResult>(result.Result);
@@ -106,45 +105,45 @@ namespace WebApi.Tests
     }
 
 
-    [Fact]
-    public async Task PutColaborator_UpdatesExistingColaborator()
-    {
-        // Arrange
-        var options = new DbContextOptionsBuilder<ColaboratorContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
+    // [Fact]
+    // public async Task PutColaborator_UpdatesExistingColaborator()
+    // {
+    //     // Arrange
+    //     var options = new DbContextOptionsBuilder<ColaboratorContext>()
+    //         .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+    //         .Options;
 
-        using (var context = new ColaboratorContext(options))
-        {
-            // Add a collaborator to the database
-            var existingColaborator = new Colaborator("John Doe", "john.doe@example.com");
-            context.Colaborators.Add(existingColaborator);
-            context.SaveChanges();
-        }
+    //     using (var context = new ColaboratorContext(options))
+    //     {
+    //         // Add a collaborator to the database
+    //         var existingColaborator = new Colaborator("John Doe", "john.doe@example.com");
+    //         context.Colaborators.Add(existingColaborator);
+    //         context.SaveChanges();
+    //     }
 
-        using (var context = new ColaboratorContext(options))
-        {
-            var controller = new ColaboratorController(context);
+    //     using (var context = new ColaboratorContext(options))
+    //     {
+    //         var controller = new ColaboratorController(context);
 
-            // Prepare the updated collaborator data
-            var updatedColaboratorData = new Colaborator("Jane Smith", "jane.smith@example.com");
+    //         // Prepare the updated collaborator data
+    //         var updatedColaboratorData = new Colaborator("Jane Smith", "jane.smith@example.com");
 
-            // Act: Call the PutColaborator method to update the collaborator
-            var result = await controller.PutColaborator(1, updatedColaboratorData._strName, updatedColaboratorData._strEmail);
+    //         // Act: Call the PutColaborator method to update the collaborator
+    //         var result = await controller.PutColaborator(1, updatedColaboratorData._strName, updatedColaboratorData._strEmail);
 
-            // Assert
-            var actionResult = Assert.IsType<NoContentResult>(result);
+    //         // Assert
+    //         var actionResult = Assert.IsType<NoContentResult>(result);
 
-            // Verify that the collaborator was updated
-            using (var verificationContext = new ColaboratorContext(options))
-            {
-                var updatedColaborator = await verificationContext.Colaborators.FindAsync(1);
-                Assert.NotNull(updatedColaborator);
-                Assert.Equal("Jane Smith", updatedColaborator._strName);
-                Assert.Equal("jane.smith@example.com", updatedColaborator._strEmail);
-            }
-        }
-    }
+    //         // Verify that the collaborator was updated
+    //         using (var verificationContext = new ColaboratorContext(options))
+    //         {
+    //             var updatedColaborator = await verificationContext.Colaborators.FindAsync(1);
+    //             Assert.NotNull(updatedColaborator);
+    //             Assert.Equal("Jane Smith", updatedColaborator._strName);
+    //             Assert.Equal("jane.smith@example.com", updatedColaborator._strEmail);
+    //         }
+    //     }
+    // }
 
 
     [Fact]

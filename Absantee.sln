@@ -7,9 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Tests", "Domain.Tests\Domain.Tests.csproj", "{91996D3A-CC55-45EA-A1DB-F99811594F98}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "WebApi\WebApi.csproj", "{26322D2C-4DDB-459E-AE19-A62BD2B7A590}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csproj", "{26322D2C-4DDB-459E-AE19-A62BD2B7A590}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.Tests", "WebApi.Tests\WebApi.Tests.csproj", "{d4b61fd0-1799-493b-ba8e-3e6b8dd70e3b}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi.Tests", "WebApi.Tests\WebApi.Tests.csproj", "{d4b61fd0-1799-493b-ba8e-3e6b8dd70e3b}"
 EndProject
 
 Global
