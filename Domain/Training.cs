@@ -8,19 +8,19 @@ namespace Domain
 {
     public class Training
     {
-        // private IColaborator _colaborator;
+        private IColaborator _colaborator;
  
-        private List<TrainingPeriod> _trainingPeriods = new List<TrainingPeriod>();
+        private List<ITrainingPeriod> _trainingPeriods = new List<ITrainingPeriod>();
         public string Description;
         private List<ISkills> _skillsPrevious;
         private List<ISkills> _skillsFinal;
  
-        public Training(string description,List<ISkills> skillsPrevious, List<ISkills> skillsFinal)
+        public Training(string description, IColaborator colab, List<ISkills> skillsPrevious, List<ISkills> skillsFinal)
         {
-            // if(colab!=null)
-            //     _colaborator = colab;
-            //     else
-            // throw new ArgumentException("Invalid argument: colaborator must be non null");
+            if(colab!=null)
+                _colaborator = colab;
+                else
+            throw new ArgumentException("Invalid argument: colaborator must be non null");
  
             if (isValidDescription(description))
             {
@@ -41,11 +41,11 @@ namespace Domain
         }
         }
 
-        public TrainingPeriod addTrainingPeriod(DateOnly startDate, DateOnly endDate) {
+        public void addTrainingPeriod(ITrainingPeriodFactory pfFactory, DateOnly startDate, DateOnly endDate) {
 
-        TrainingPeriod period = new TrainingPeriod(startDate, endDate);
-        _trainingPeriods.Add(period);
-        return period;
+        ITrainingPeriod trainingPeriod = pfFactory.NewTrainingPeriod(startDate, endDate);
+        _trainingPeriods.Add(trainingPeriod);
+        
         }
 
         public int ListCount(){

@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Domain.DataBaseContext; // Import your DbContext namespace
+using Domain.DataBaseContext;
+using Domain.Service; // Import your DbContext namespace
 
 namespace WebApi
 {
@@ -15,7 +16,11 @@ namespace WebApi
             services.AddDbContext<ColaboratorContext>(options =>
                 options.UseInMemoryDatabase("ColaboratorContext"));
             
+            services.AddDbContext<HolidayContext>(options =>
+                options.UseInMemoryDatabase("HolidayContext"));
+            
             // Add controllers
+            services.AddScoped<ColaboratorService>(); 
             services.AddControllers();
         }
 

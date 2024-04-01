@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Domain;
 using Domain.DataBaseContext;
+using Newtonsoft.Json;
 
 
 namespace WebApi.Controllers
@@ -21,21 +22,49 @@ namespace WebApi.Controllers
     {
         _context = context;
     }
-
     private bool ColaboratorExists(int id)
     {
         return _context.Colaborators.Any(e => e.Id == id);
     }
+    // [HttpPost]
+    // public async Task<ActionResult<Colaborator>> CreateColaborator(string name, string email)
+    // {
+    // try
+    //     {
+    //         Colaborator collaborator = new Colaborator(name, email);
+    //         _context.Colaborators.Add(collaborator);
+    //         await _context.SaveChangesAsync();
+
+    //         return Ok(collaborator);
+    //     }
+    //     catch (ArgumentException ex)
+    //     {
+    //         return BadRequest(ex.Message);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         return StatusCode(500, ex.Message); // Return 500 if any unexpected error occurs
+    //     }
+    // }
+
     [HttpPost]
-    public async Task<ActionResult<Colaborator>> CreateColaborator(string name, string email)
+    public async Task<ActionResult<Colaborator>> CreateColaboratorWithObject([FromBody] Colaborator colaborator)
     {
-    try
+        try
         {
-            Colaborator collaborator = new Colaborator(name, email);
-            _context.Colaborators.Add(collaborator);
+            if (string.IsNullOrEmpty(colaborator._strName) || string.IsNullOrEmpty(colaborator._strEmail))
+            {
+                return BadRequest("Name and email must not be empty.");
+            }
+            if (!colaborator.IsValidEmailAddres(colaborator._strEmail))
+            {
+                return BadRequest("Invalid email format.");
+            }
+            
+            _context.Colaborators.Add(colaborator);
             await _context.SaveChangesAsync();
 
-            return Ok(collaborator);
+            return Ok(colaborator);
         }
         catch (ArgumentException ex)
         {
@@ -88,6 +117,28 @@ namespace WebApi.Controllers
         }
     }
 
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Colaborator>>> GetAllColaborators()
+    {
+        try
+        {
+            var collaborators = await _context.Colaborators.ToListAsync();
+
+            if (collaborators == null || collaborators.Count == 0)
+            {
+                return NotFound(); // Return 404 if no collaborators are found
+            }
+
+            // Return collaborators with 200 OK status code
+            return Ok(collaborators);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message); // Return 500 if any unexpected error occurs
+        }
+    }
+
+
 
     [HttpPut("{id}")]
     public async Task<IActionResult> PutColaborator(int id, string name, string email)
@@ -123,7 +174,7 @@ namespace WebApi.Controllers
             }
         }
 
-        return NoContent();
+        return Ok(colaboratorInstance);
     }
 
 

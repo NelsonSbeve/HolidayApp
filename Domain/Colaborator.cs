@@ -2,6 +2,8 @@
 
 
 using System.Net.Mail;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 public class Colaborator : IColaborator
 {	
@@ -10,8 +12,9 @@ public class Colaborator : IColaborator
     public string _strEmail {get; set;}
 
 
-	
-    public Colaborator(string strName, string strEmail) {
+	public Colaborator(){}
+
+	public Colaborator(string strName, string strEmail) {
 
 		if( isValidParameters(strName, strEmail) ) {
 			_strName = strName;
